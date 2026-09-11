@@ -37,12 +37,35 @@ function sortTree(node: TreeNode) {
   for (const child of node.children) sortTree(child);
 }
 
-function TreeBranch({ node }: { node: TreeNode }) {
+type TreeBranchProps = {
+  node: TreeNode;
+  guides: boolean[];
+  isLast: boolean;
+  isRoot?: boolean;
+};
+
+function treePrefix(guides: boolean[], isLast: boolean, isRoot: boolean) {
+  if (isRoot) return { guide: "", branch: "" };
+
+  const guide = guides.map((continues) => (continues ? "│   " : "    ")).join("");
+  const branch = isLast ? "└── " : "├── ";
+  return { guide, branch };
+}
+
+function TreeBranch({ node, guides, isLast, isRoot = false }: TreeBranchProps) {
   const isFile = node.children.length === 0;
+  const { guide, branch } = treePrefix(guides, isLast, isRoot);
+  const childGuides = [...guides, !isLast];
 
   return (
     <li className="file-tree__node">
       <div className="file-tree__row">
+        {(guide || branch) && (
+          <span className="file-tree__guide" aria-hidden="true">
+            {guide}
+            {branch}
+          </span>
+        )}
         <span className="file-tree__name">{node.name}</span>
         {node.entry?.change && (
           <span className={`file-tree__badge file-tree__badge--${node.entry.change}`}>
@@ -50,11 +73,20 @@ function TreeBranch({ node }: { node: TreeNode }) {
           </span>
         )}
       </div>
-      {node.entry?.note && <p className="file-tree__note">{node.entry.note}</p>}
+      {node.entry?.note && (
+        <p className="file-tree__note" style={{ marginLeft: `${guide.length + branch.length}ch` }}>
+          {node.entry.note}
+        </p>
+      )}
       {!isFile && (
         <ul className="file-tree__children">
-          {node.children.map((child) => (
-            <TreeBranch key={child.path} node={child} />
+          {node.children.map((child, index) => (
+            <TreeBranch
+              key={child.path}
+              node={child}
+              guides={childGuides}
+              isLast={index === node.children.length - 1}
+            />
           ))}
         </ul>
       )}
@@ -74,8 +106,14 @@ export function FileTree({ title, entries }: FileTreeProps) {
     <section className="file-tree">
       {title && <h3 className="file-tree__title">{title}</h3>}
       <ul className="file-tree__root">
-        {root.children.map((child) => (
-          <TreeBranch key={child.path} node={child} />
+        {root.children.map((child, index) => (
+          <TreeBranch
+            key={child.path}
+            node={child}
+            guides={[]}
+            isLast={index === root.children.length - 1}
+            isRoot
+          />
         ))}
       </ul>
     </section>
