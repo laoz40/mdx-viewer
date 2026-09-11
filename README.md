@@ -1,4 +1,4 @@
-# plan-viewer
+# mdx-planner
 
 Local MDX viewer for coding plans. No hosted UI, no per-project npm deps.
 
@@ -7,8 +7,8 @@ MDX components in `src/components/` follow the [visual-plan](https://github.com/
 ## Setup
 
 ```bash
-git clone <this-repo> plan-viewer
-cd plan-viewer
+git clone <this-repo> mdx-planner
+cd mdx-planner
 pnpm install
 ```
 
@@ -17,10 +17,10 @@ pnpm install
 Symlink the bundled script onto your `PATH`:
 
 ```bash
-ln -sf "$(pwd)/bin/plan-view" ~/.local/bin/plan-view
+ln -sf "$(pwd)/bin/mdx-planner" ~/.local/bin/mdx-planner
 ```
 
-`plan-view` resolves this checkout from the script location. Set `PLAN_VIEWER_ROOT` if you symlink or copy it somewhere else.
+`mdx-planner` resolves this checkout from the script location. Set `MDX_PLANNER_ROOT` if you symlink or copy it somewhere else.
 
 Without the CLI:
 
@@ -37,19 +37,19 @@ For agents that load skills from `~/.agents/skills/` (Cursor, pi, etc.):
 ln -sf "$(pwd)/skills/plan-mdx" ~/.agents/skills/plan-mdx
 ```
 
-Source: [`skills/plan-mdx/SKILL.md`](skills/plan-mdx/SKILL.md). Tells agents how to author plan MDX and open plans with `plan-view`.
+Source: [`skills/plan-mdx/SKILL.md`](skills/plan-mdx/SKILL.md). Tells agents how to author plan MDX and open plans with `mdx-planner`.
 
 ## Usage
 
 From any project with `plans/<slug>/plan.mdx`:
 
 ```bash
-plan-view plans/example
+mdx-planner plans/example
 ```
 
 Environment:
 
-- `PLAN_VIEWER_ROOT` — path to this checkout (required if the CLI is not colocated with the repo)
+- `MDX_PLANNER_ROOT` — path to this checkout (required if the CLI is not colocated with the repo)
 - `PLAN_PORT` — dev server port (default `5199`)
 - `PLAN_OPEN=0` — do not open a browser tab
 

@@ -9,7 +9,7 @@ description: Write structured implementation plans as local MDX files with custo
 
 Write plans to `plans/<slug>/plan.mdx` in the current project (or `plans/<slug>.mdx`).
 
-- Open locally with `plan-view plans/<slug>` from the project root.
+- Open locally with `mdx-planner plans/<slug>` from the project root.
 - Do not add npm deps to the project. Do not copy React components into the repo.
 
 ## Authoring rules

@@ -2,20 +2,20 @@
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VIEWER_ROOT="${PLAN_VIEWER_ROOT:-$(cd "$script_dir/.." && pwd)}"
+PLANNER_ROOT="${MDX_PLANNER_ROOT:-$(cd "$script_dir/.." && pwd)}"
 
 usage() {
   cat <<'EOF'
-Usage: plan-view <plan-folder|plan.mdx>
+Usage: mdx-planner <plan-folder|plan.mdx>
 
-Opens a local MDX plan in the global plan viewer (Vite dev server).
+Opens a local MDX plan in the global mdx-planner viewer (Vite dev server).
 
 Examples:
-  plan-view plans/auth-refactor
-  plan-view plans/auth-refactor/plan.mdx
+  mdx-planner plans/auth-refactor
+  mdx-planner plans/auth-refactor/plan.mdx
 
 Environment:
-  PLAN_VIEWER_ROOT   Viewer checkout (default: parent of this script's directory)
+  MDX_PLANNER_ROOT   Viewer checkout (default: parent of this script's directory)
   PLAN_PORT          Dev server port (default: 5199)
   PLAN_OPEN=0        Skip opening a browser tab
 EOF
@@ -45,9 +45,9 @@ case "${1:-}" in
     ;;
 esac
 
-if [[ ! -d "$VIEWER_ROOT" ]]; then
-  echo "error: plan viewer not found at $VIEWER_ROOT" >&2
-  echo "set PLAN_VIEWER_ROOT to your plan-viewer checkout" >&2
+if [[ ! -d "$PLANNER_ROOT" ]]; then
+  echo "error: mdx-planner not found at $PLANNER_ROOT" >&2
+  echo "set MDX_PLANNER_ROOT to your mdx-planner checkout" >&2
   exit 1
 fi
 
@@ -56,15 +56,15 @@ export PLAN_FILE="$plan_file"
 export PLAN_OPEN="${PLAN_OPEN:-1}"
 export PLAN_PORT="${PLAN_PORT:-5199}"
 
-cd "$VIEWER_ROOT"
+cd "$PLANNER_ROOT"
 
 if [[ ! -d node_modules ]]; then
-  echo "installing plan-viewer dependencies..."
+  echo "installing mdx-planner dependencies..."
   pnpm install
 fi
 
 echo "plan: $plan_file"
-echo "viewer: $VIEWER_ROOT"
+echo "viewer: $PLANNER_ROOT"
 echo "url: http://localhost:${PLAN_PORT}"
 
 exec pnpm dev
