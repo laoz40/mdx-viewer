@@ -1,0 +1,57 @@
+# Example plan
+
+Local MDX plan viewer smoke test.
+
+<Callout
+  tone="decision"
+  body="Plans live in `plans/<slug>/plan.mdx` inside each repo. The viewer stays global."
+/>
+
+<FileTree
+  title="Scope"
+  entries={[
+    { path: "server/routes/tasks.ts", change: "modified" },
+    { path: "server/routes/tasks.test.ts", change: "added", note: "Covers create path" },
+  ]}
+/>
+
+<Tabs>
+  <Tab id="handler" label="tasks.ts">
+    <Diff
+      id="diff-handler"
+      summary="Add POST /api/tasks handler"
+      filename="server/routes/tasks.ts"
+      language="ts"
+      before={`router.get("/api/tasks", list);`}
+      after={`router.get("/api/tasks", list);\nrouter.post("/api/tasks", create);`}
+      annotations={[{ side: "after", lines: "2", label: "New route", note: "Creates a task" }]}
+    />
+  </Tab>
+  <Tab id="test" label="tasks.test.ts">
+    <AnnotatedCode
+      filename="server/routes/tasks.test.ts"
+      language="ts"
+      code={`import { createTask } from "./tasks";\n\ntest("creates a task", async () => {\n  const result = await createTask({ title: "Ship" });\n  expect(result.id).toBeDefined();\n});`}
+      annotations={[{ lines: "3-5", label: "Happy path", note: "Assert id is returned" }]}
+    />
+  </Tab>
+</Tabs>
+
+<Code
+  language="bash"
+  code={`plan-view plans/example`}
+  caption="Open a plan from the project root"
+/>
+
+<Mermaid
+  source={`sequenceDiagram\n  participant Client\n  participant API\n  Client->>API: POST /api/tasks\n  API-->>Client: 201 Created`}
+  caption="Create task flow"
+/>
+
+<Checklist
+  items={[
+    { id: "route", label: "Add POST route", checked: false },
+    { id: "test", label: "Add handler test", checked: false, note: "Use existing test helpers" },
+    { id: "docs", label: "Update API notes", checked: false },
+  ]}
+/>
