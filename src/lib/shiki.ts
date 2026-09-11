@@ -1,11 +1,13 @@
 import { createHighlighter, type Highlighter } from "shiki";
 
+const THEME = "tokyo-night";
+
 let highlighter: Highlighter | null = null;
 
 async function getHighlighter(): Promise<Highlighter> {
   if (!highlighter) {
     highlighter = await createHighlighter({
-      themes: ["github-dark"],
+      themes: [THEME],
       langs: [
         "typescript",
         "tsx",
@@ -32,5 +34,5 @@ async function getHighlighter(): Promise<Highlighter> {
 export async function highlightCode(code: string, language = "text"): Promise<string> {
   const hl = await getHighlighter();
   const lang = hl.getLoadedLanguages().includes(language as never) ? language : "text";
-  return hl.codeToHtml(code, { lang, theme: "github-dark" });
+  return hl.codeToHtml(code, { lang, theme: THEME });
 }
