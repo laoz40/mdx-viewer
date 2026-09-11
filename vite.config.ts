@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import mdx from "@mdx-js/rollup";
 import react from "@vitejs/plugin-react";
+import remarkGfm from "remark-gfm";
 import { defineConfig } from "vite";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
@@ -16,6 +17,7 @@ export default defineConfig({
       ...mdx({
         providerImportSource: "@mdx-js/react",
         mdxExtensions: [".mdx"],
+        remarkPlugins: [remarkGfm],
       }),
     },
     react(),

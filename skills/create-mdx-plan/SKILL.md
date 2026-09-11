@@ -21,6 +21,7 @@ Write plans to `plans/<slug>/plan.mdx` in the current project (or `plans/<slug>.
 - Prefer `<FileTree>` near the top for scope.
 - Use `<Callout tone="risk">` (or `warning`, `decision`, `info`, `success`) for assumptions and tradeoffs.
 - Group per-file changes with `<Tabs>` and `<Tab label="...">` children.
+- Use markdown task lists (`- [ ]` / `- [x]`) for implementation steps.
 
 ## Blocks
 
@@ -53,10 +54,6 @@ Plain snippet. Props: `code`, `language?`, `filename?`, `caption?`, `maxLines?`.
 
 Note or decision. Props: `tone?`, `body` (markdown string).
 
-### Checklist
-
-Implementation steps. Props: `items` (`id`, `label`, `checked?`, `note?`).
-
 ### Mermaid
 
 Diagram. Props: `source`, `caption?`.
@@ -88,5 +85,8 @@ Group blocks by file or step. Wrap `<Tab label="..." id?="...">` children.
   </Tab>
 </Tabs>
 
-<Checklist items={[...]} />
+## Implementation
+
+- [ ] Step one
+- [ ] Step two
 ```

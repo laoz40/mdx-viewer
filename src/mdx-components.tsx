@@ -1,7 +1,6 @@
 import type { MDXComponents } from "mdx/types";
 
 import { Callout } from "./components/Callout";
-import { Checklist } from "./components/Checklist";
 import { Code } from "./components/Code";
 import { Diff } from "./components/Diff";
 import { FileTree } from "./components/FileTree";
@@ -13,7 +12,6 @@ export const planMdxComponents: MDXComponents = {
   FileTree,
   Code,
   Callout,
-  Checklist,
   Mermaid,
   Tabs,
   Tab,

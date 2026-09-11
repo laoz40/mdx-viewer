@@ -13,11 +13,4 @@ export type FileTreeEntry = {
   language?: string;
 };
 
-export type ChecklistItem = {
-  id: string;
-  label: string;
-  checked?: boolean;
-  note?: string;
-};
-
 export type CalloutTone = "info" | "decision" | "risk" | "warning" | "success";
