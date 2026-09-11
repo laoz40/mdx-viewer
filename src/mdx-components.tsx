@@ -1,6 +1,5 @@
 import type { MDXComponents } from "mdx/types";
 
-import { AnnotatedCode } from "./components/AnnotatedCode";
 import { Callout } from "./components/Callout";
 import { Checklist } from "./components/Checklist";
 import { Code } from "./components/Code";
@@ -11,7 +10,6 @@ import { Tab, Tabs } from "./components/Tabs";
 
 export const planMdxComponents: MDXComponents = {
   Diff,
-  AnnotatedCode,
   FileTree,
   Code,
   Callout,

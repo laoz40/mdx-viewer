@@ -16,7 +16,8 @@ Write plans to `plans/<slug>/plan.mdx` in the current project (or `plans/<slug>.
 
 - Multiline strings in props: use JSX expressions, e.g. `code={"line1\nline2"}`.
 - Every `<Diff>` needs `summary`, `before`, and `after`.
-- New files with no meaningful before state: use `<AnnotatedCode>`, not `<Diff>`.
+- New files with no meaningful before state: use `<Code>`, not `<Diff>`.
+- **Prefer inline code comments** in `before`, `after`, and `code` strings to explain what changed or why. Put the note on the line it applies to. Reserve `<Diff annotations={...}>` for planner-only context that must not appear as code (e.g. "do not commit this yet").
 - Prefer `<FileTree>` near the top for scope.
 - Use `<Callout tone="risk">` (or `warning`, `decision`, `info`, `success`) for assumptions and tradeoffs.
 - Group per-file changes with `<Tabs>` and `<Tab label="...">` children.
@@ -25,7 +26,7 @@ Write plans to `plans/<slug>/plan.mdx` in the current project (or `plans/<slug>.
 
 ### Diff
 
-Before/after file change. Props: `id?`, `summary`, `filename?`, `language?`, `before`, `after`, `mode?` (`unified`|`split`), `annotations?`.
+Before/after file change. Props: `id?`, `summary`, `filename?`, `language?`, `before`, `after`, `mode?` (`unified`|`split`), `annotations?` (last resort; prefer comments in the snippet).
 
 ```mdx
 <Diff
@@ -34,14 +35,9 @@ Before/after file change. Props: `id?`, `summary`, `filename?`, `language?`, `be
   filename="server/routes/tasks.ts"
   language="ts"
   before={`router.get("/api/tasks", list);`}
-  after={`router.get("/api/tasks", list);\nrouter.post("/api/tasks", create);`}
-  annotations={[{ side: "after", lines: "2", label: "New route", note: "Creates a task" }]}
+  after={`router.get("/api/tasks", list);\nrouter.post("/api/tasks", create); // creates a task`}
 />
 ```
-
-### AnnotatedCode
-
-New file or walkthrough. Props: `filename?`, `language?`, `code`, `annotations?` (`lines`, `label?`, `note`).
 
 ### FileTree
 
@@ -51,7 +47,7 @@ Scope overview. Props: `title?`, `entries` (`path`, `change?`, `note?`).
 
 ### Code
 
-Plain snippet. Props: `code`, `language?`, `filename?`, `caption?`, `maxLines?`.
+Plain snippet. Props: `code`, `language?`, `filename?`, `caption?`, `maxLines?`. Use inline comments in `code` for line-level notes; use `caption` for file-level context.
 
 ### Callout
 

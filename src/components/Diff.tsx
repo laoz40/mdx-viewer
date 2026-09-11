@@ -1,7 +1,6 @@
 import { diffLines } from "diff";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
-import { highlightCode } from "../lib/shiki";
 import { parseLineRange } from "../lib/lines";
 import type { DiffAnnotation } from "../types";
 
@@ -24,8 +23,12 @@ type DiffRow = {
   afterNo?: number;
 };
 
+function normalizeDiffText(text: string): string {
+  return text.endsWith("\n") ? text : `${text}\n`;
+}
+
 function buildRows(before: string, after: string): DiffRow[] {
-  const changes = diffLines(before, after);
+  const changes = diffLines(normalizeDiffText(before), normalizeDiffText(after));
   const rows: DiffRow[] = [];
   let beforeNo = 1;
   let afterNo = 1;
@@ -74,33 +77,72 @@ function annotationForLine(
   });
 }
 
+function diffRowClass(kind: DiffRow["kind"]) {
+  return kind === "same" ? "diff-row" : `diff-row diff-row--${kind}`;
+}
+
+function splitRowClass(side: "before" | "after", kind: DiffRow["kind"]) {
+  if (side === "before" && kind === "remove") return diffRowClass("remove");
+  if (side === "after" && kind === "add") return diffRowClass("add");
+  return diffRowClass("same");
+}
+
+function DiffAnnotationNote({ note }: { note: DiffAnnotation }) {
+  return (
+    <aside className="diff-annotation">
+      {note.label && <strong className="diff-annotation__label">{note.label}</strong>}
+      <span>{note.note}</span>
+    </aside>
+  );
+}
+
+function SplitPane({
+  side,
+  label,
+  rows,
+  annotations,
+}: {
+  side: "before" | "after";
+  label: string;
+  rows: DiffRow[];
+  annotations?: DiffAnnotation[];
+}) {
+  return (
+    <div className="diff-pane">
+      <div className="diff-pane__label">{label}</div>
+      <table className="diff-table">
+        <tbody>
+          {rows.map((row, index) => {
+            const lineNo = side === "before" ? row.beforeNo : row.afterNo;
+            const line = side === "before" ? row.beforeLine : row.afterLine;
+            const note = annotationForLine(annotations, side, lineNo);
+
+            return (
+              <tr key={`${side}-${row.kind}-${index}`} className={splitRowClass(side, row.kind)}>
+                <td className="diff-table__gutter">{lineNo ?? ""}</td>
+                <td className="diff-table__line">
+                  <code>{line ?? ""}</code>
+                  {note && <DiffAnnotationNote note={note} />}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export function Diff({
   summary,
   filename,
-  language = "text",
+  language: _language = "text",
   before,
   after,
   mode = "unified",
   annotations,
 }: DiffProps) {
   const rows = useMemo(() => buildRows(before, after), [before, after]);
-  const [beforeHtml, setBeforeHtml] = useState("");
-  const [afterHtml, setAfterHtml] = useState("");
-
-  useEffect(() => {
-    let cancelled = false;
-    void Promise.all([highlightCode(before, language), highlightCode(after, language)]).then(
-      ([beforeResult, afterResult]) => {
-        if (!cancelled) {
-          setBeforeHtml(beforeResult);
-          setAfterHtml(afterResult);
-        }
-      },
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [before, after, language]);
 
   return (
     <section className="diff-block">
@@ -111,14 +153,8 @@ export function Diff({
 
       {mode === "split" ? (
         <div className="diff-block__split">
-          <div className="diff-pane">
-            <div className="diff-pane__label">before</div>
-            <div className="shiki-wrap" dangerouslySetInnerHTML={{ __html: beforeHtml }} />
-          </div>
-          <div className="diff-pane">
-            <div className="diff-pane__label">after</div>
-            <div className="shiki-wrap" dangerouslySetInnerHTML={{ __html: afterHtml }} />
-          </div>
+          <SplitPane side="before" label="before" rows={rows} annotations={annotations} />
+          <SplitPane side="after" label="after" rows={rows} annotations={annotations} />
         </div>
       ) : (
         <table className="diff-table">
@@ -129,7 +165,7 @@ export function Diff({
               const note = afterNote ?? beforeNote;
 
               return (
-                <tr key={`${row.kind}-${index}`} className={`diff-row diff-row--${row.kind}`}>
+                <tr key={`${row.kind}-${index}`} className={diffRowClass(row.kind)}>
                   <td className="diff-table__gutter">{row.beforeNo ?? ""}</td>
                   <td className="diff-table__gutter">{row.afterNo ?? ""}</td>
                   <td className="diff-table__sign">
@@ -137,14 +173,7 @@ export function Diff({
                   </td>
                   <td className="diff-table__line">
                     <code>{row.afterLine ?? row.beforeLine ?? ""}</code>
-                    {note && (
-                      <aside className="diff-annotation">
-                        {note.label && (
-                          <strong className="diff-annotation__label">{note.label}</strong>
-                        )}
-                        <span>{note.note}</span>
-                      </aside>
-                    )}
+                    {note && <DiffAnnotationNote note={note} />}
                   </td>
                 </tr>
               );

@@ -5,12 +5,6 @@ export type DiffAnnotation = {
   note: string;
 };
 
-export type AnnotatedCodeAnnotation = {
-  lines: string;
-  label?: string;
-  note: string;
-};
-
 export type FileTreeEntry = {
   path: string;
   change?: "added" | "modified" | "removed" | "renamed";

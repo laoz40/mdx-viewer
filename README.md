@@ -57,7 +57,7 @@ Environment:
 
 These tags match the visual-plan component set:
 
-`Diff`, `AnnotatedCode`, `FileTree`, `Code`, `Callout`, `Checklist`, `Mermaid`, `Tabs` / `Tab`.
+`Diff`, `FileTree`, `Code`, `Callout`, `Checklist`, `Mermaid`, `Tabs` / `Tab`.
 
 Component source: [`src/components/`](src/components/). Authoring contract: [`skills/create-mdx-plan/SKILL.md`](skills/create-mdx-plan/SKILL.md). Block reference: [visual-plan SKILL.md](https://github.com/BuilderIO/skills/blob/main/skills/visual-plan/SKILL.md).
 
