@@ -6,13 +6,13 @@ PLANNER_ROOT="${MDX_PLANNER_ROOT:-$(cd "$script_dir/.." && pwd)}"
 
 usage() {
   cat <<'EOF'
-Usage: mdx-planner <plan-folder|plan.mdx>
+Usage: mdxp <plan-folder|plan.mdx>
 
 Opens a local MDX plan in the global mdx-planner viewer (Vite dev server).
 
 Examples:
-  mdx-planner plans/auth-refactor
-  mdx-planner plans/auth-refactor/plan.mdx
+  mdxp plans/auth-refactor
+  mdxp plans/auth-refactor/plan.mdx
 
 Environment:
   MDX_PLANNER_ROOT   Viewer checkout (default: parent of this script's directory)

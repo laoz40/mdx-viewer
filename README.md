@@ -17,10 +17,10 @@ pnpm install
 Symlink the bundled script onto your `PATH`:
 
 ```bash
-ln -sf "$(pwd)/bin/mdx-planner" ~/.local/bin/mdx-planner
+ln -sf "$(pwd)/bin/mdxp" ~/.local/bin/mdxp
 ```
 
-`mdx-planner` resolves this checkout from the script location. Set `MDX_PLANNER_ROOT` if you symlink or copy it somewhere else.
+`mdxp` resolves this checkout from the script location. Set `MDX_PLANNER_ROOT` if you symlink or copy it somewhere else.
 
 Without the CLI:
 
@@ -34,17 +34,17 @@ pnpm dev
 For agents that load skills from `~/.agents/skills/` (Cursor, pi, etc.):
 
 ```bash
-ln -sf "$(pwd)/skills/plan-mdx" ~/.agents/skills/plan-mdx
+ln -sf "$(pwd)/skills/create-mdx-plan" ~/.agents/skills/create-mdx-plan
 ```
 
-Source: [`skills/plan-mdx/SKILL.md`](skills/plan-mdx/SKILL.md). Tells agents how to author plan MDX and open plans with `mdx-planner`.
+Source: [`skills/create-mdx-plan/SKILL.md`](skills/create-mdx-plan/SKILL.md). Tells agents how to author plan MDX and open plans with `mdxp`.
 
 ## Usage
 
 From any project with `plans/<slug>/plan.mdx`:
 
 ```bash
-mdx-planner plans/example
+mdxp plans/example
 ```
 
 Environment:
@@ -59,7 +59,7 @@ These tags match the visual-plan component set:
 
 `Diff`, `AnnotatedCode`, `FileTree`, `Code`, `Callout`, `Checklist`, `Mermaid`, `Tabs` / `Tab`.
 
-Component source: [`src/components/`](src/components/). Authoring contract: [`skills/plan-mdx/SKILL.md`](skills/plan-mdx/SKILL.md). Block reference: [visual-plan SKILL.md](https://github.com/BuilderIO/skills/blob/main/skills/visual-plan/SKILL.md).
+Component source: [`src/components/`](src/components/). Authoring contract: [`skills/create-mdx-plan/SKILL.md`](skills/create-mdx-plan/SKILL.md). Block reference: [visual-plan SKILL.md](https://github.com/BuilderIO/skills/blob/main/skills/visual-plan/SKILL.md).
 
 ## Attribution
 

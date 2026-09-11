@@ -1,15 +1,15 @@
 ---
-name: plan-mdx
+name: create-mdx-plan
 description: Write structured implementation plans as local MDX files with custom components. Use when the user wants a visual coding plan or MDX plan.
 ---
 
-# Plan MDX
+# Create MDX plan
 
 ## Output
 
 Write plans to `plans/<slug>/plan.mdx` in the current project (or `plans/<slug>.mdx`).
 
-- Open locally with `mdx-planner plans/<slug>` from the project root.
+- Open locally with `mdxp plans/<slug>` from the project root.
 - Do not add npm deps to the project. Do not copy React components into the repo.
 
 ## Authoring rules
