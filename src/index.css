@@ -21,6 +21,11 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -143,6 +148,8 @@ code {
 .diff-block__body {
   overflow: auto;
   max-width: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .diff-table {
@@ -151,11 +158,15 @@ code {
   border-collapse: collapse;
   font-size: var(--code-size);
   line-height: var(--code-line-height);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .diff-table td {
   border-top: 1px solid #21262d;
   vertical-align: top;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .diff-table__gutter {
@@ -194,6 +205,8 @@ code {
 
 .diff-line-wrap {
   display: block;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .diff-line-pre {
@@ -205,6 +218,8 @@ code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: var(--code-size);
   line-height: var(--code-line-height);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .diff-table__code {
@@ -444,5 +459,13 @@ code {
 
   .diff-block__split {
     grid-template-columns: 1fr;
+  }
+
+  .diff-table__gutter,
+  .diff-table__sign,
+  .diff-line-pre,
+  .diff-table__code {
+    font-size: 12px;
+    line-height: 1.45;
   }
 }
