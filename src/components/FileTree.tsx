@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type CSSProperties } from "react";
 
 import type { FileTreeEntry } from "../types";
 
@@ -37,6 +37,25 @@ function sortTree(node: TreeNode) {
   for (const child of node.children) sortTree(child);
 }
 
+type TreeGuidesProps = {
+  guides: boolean[];
+  isLast: boolean;
+};
+
+function TreeGuides({ guides, isLast }: TreeGuidesProps) {
+  return (
+    <span className="file-tree__guides" aria-hidden="true">
+      {guides.map((continues, index) => (
+        <span
+          key={index}
+          className={`file-tree__guide${continues ? " file-tree__guide--continues" : ""}`}
+        />
+      ))}
+      <span className={`file-tree__branch${isLast ? " file-tree__branch--last" : ""}`} />
+    </span>
+  );
+}
+
 type TreeBranchProps = {
   node: TreeNode;
   guides: boolean[];
@@ -44,28 +63,15 @@ type TreeBranchProps = {
   isRoot?: boolean;
 };
 
-function treePrefix(guides: boolean[], isLast: boolean, isRoot: boolean) {
-  if (isRoot) return { guide: "", branch: "" };
-
-  const guide = guides.map((continues) => (continues ? "│   " : "    ")).join("");
-  const branch = isLast ? "└── " : "├── ";
-  return { guide, branch };
-}
-
 function TreeBranch({ node, guides, isLast, isRoot = false }: TreeBranchProps) {
   const isFile = node.children.length === 0;
-  const { guide, branch } = treePrefix(guides, isLast, isRoot);
   const childGuides = [...guides, !isLast];
+  const indent = isRoot ? 0 : guides.length + 1;
 
   return (
     <li className="file-tree__node">
       <div className="file-tree__row">
-        {(guide || branch) && (
-          <span className="file-tree__guide" aria-hidden="true">
-            {guide}
-            {branch}
-          </span>
-        )}
+        {!isRoot && <TreeGuides guides={guides} isLast={isLast} />}
         <span className="file-tree__name">{node.name}</span>
         {node.entry?.change && (
           <span className={`file-tree__badge file-tree__badge--${node.entry.change}`}>
@@ -74,7 +80,7 @@ function TreeBranch({ node, guides, isLast, isRoot = false }: TreeBranchProps) {
         )}
       </div>
       {node.entry?.note && (
-        <p className="file-tree__note" style={{ marginLeft: `${guide.length + branch.length}ch` }}>
+        <p className="file-tree__note" style={{ "--tree-depth": indent } as CSSProperties}>
           {node.entry.note}
         </p>
       )}

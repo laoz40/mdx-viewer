@@ -183,16 +183,57 @@ code {
 .file-tree__row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.file-tree__name {
+  min-width: 0;
+  word-break: break-word;
+}
+
+.file-tree__guides {
+  display: inline-flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  height: 1.4em;
 }
 
 .file-tree__guide {
-  color: #484f58;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.85rem;
-  line-height: 1.4;
-  user-select: none;
-  white-space: pre;
+  width: 1rem;
+  flex-shrink: 0;
+}
+
+.file-tree__guide--continues {
+  border-left: 1px solid #484f58;
+}
+
+.file-tree__branch {
+  position: relative;
+  width: 1rem;
+  flex-shrink: 0;
+}
+
+.file-tree__branch::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid #484f58;
+}
+
+.file-tree__branch::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  border-top: 1px solid #484f58;
+}
+
+.file-tree__branch--last::before {
+  bottom: 50%;
 }
 
 .file-tree__badge {
@@ -224,6 +265,7 @@ code {
 
 .file-tree__note {
   margin: 0.2rem 0 0.4rem;
+  margin-left: calc(var(--tree-depth, 0) * 1rem);
   color: #8b949e;
   font-size: 0.85rem;
   white-space: pre-wrap;
