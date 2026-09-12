@@ -9,7 +9,7 @@ usage() {
   cat <<'EOF'
 Usage: mdxp <plan-folder|plan.mdx>
 
-Opens a local MDX plan in the global mdx-planner viewer (Vite dev server).
+Opens a local MDX plan in the global mdx-planner viewer.
 
 Examples:
   mdxp plans/auth-refactor
@@ -17,7 +17,8 @@ Examples:
 
 Environment:
   MDX_PLANNER_ROOT   Viewer checkout (default: parent of this script's directory)
-  PLAN_PORT          Dev server port (default: 5199)
+  PLAN_PORT          Server port (default: 5199)
+  PLAN_HOST          Bind address (default: 127.0.0.1)
   PLAN_OPEN=0        Skip opening a browser tab
 EOF
 }

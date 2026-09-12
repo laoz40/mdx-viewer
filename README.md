@@ -2,7 +2,7 @@
 
 Local MDX viewer for coding plans. No hosted UI, no per-project npm deps.
 
-MDX components in `src/components/` follow the [visual-plan](https://github.com/BuilderIO/skills/tree/main/skills/visual-plan) block catalog from [BuilderIO/skills](https://github.com/BuilderIO/skills). See `examples/sample/plan.mdx` for a component demo.
+MDX components in `src/components/` follow the [visual-plan](https://github.com/BuilderIO/skills/tree/main/skills/visual-plan) block catalog from [BuilderIO/skills](https://github.com/BuilderIO/skills). See `example/plan.mdx` for a component demo.
 
 ## Setup
 
@@ -50,7 +50,8 @@ mdxp plans/example
 Environment:
 
 - `MDX_PLANNER_ROOT` — path to this checkout (required if the CLI is not colocated with the repo)
-- `PLAN_PORT` — dev server port (default `5199`)
+- `PLAN_PORT` — server port (default `5199`)
+- `PLAN_HOST` — bind address (default `127.0.0.1`; use `0.0.0.0` for LAN/Tailscale)
 - `PLAN_OPEN=0` — do not open a browser tab
 
 ## MDX blocks
