@@ -156,8 +156,6 @@ code {
   width: max-content;
   min-width: 100%;
   border-collapse: collapse;
-  font-size: var(--code-size);
-  line-height: var(--code-line-height);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
