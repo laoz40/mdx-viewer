@@ -61,13 +61,18 @@ async function build() {
     },
   });
 
+  const planBaseName = path.basename(planFile);
+  const pageTitle =
+    planBaseName === "plan.mdx" || planBaseName === "plan.md"
+      ? path.basename(path.dirname(planFile))
+      : planBaseName;
   const html = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mdx-planner</title>
+    <title>${pageTitle}</title>
     <link rel="stylesheet" href="/main.css" />
   </head>
   <body>
