@@ -30,6 +30,7 @@ export default defineConfig({
   server: {
     host: "127.0.0.1",
     port: Number(process.env.PLAN_PORT ?? 5199),
+    strictPort: true,
     allowedHosts: [".ts.net"],
     open: process.env.PLAN_OPEN !== "0",
   },
