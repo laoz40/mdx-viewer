@@ -13,6 +13,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --code-size: 0.75rem;
+  --code-line-height: 1.45;
 }
 
 * {
@@ -48,6 +50,13 @@ code {
   margin: 0;
   overflow: auto;
   border-radius: 8px;
+  font-size: var(--code-size);
+  line-height: var(--code-line-height);
+}
+
+.shiki-wrap pre code {
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .code-block,
@@ -140,7 +149,8 @@ code {
   width: max-content;
   min-width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: var(--code-size);
+  line-height: var(--code-line-height);
 }
 
 .diff-table td {
@@ -154,11 +164,17 @@ code {
   color: #6e7681;
   text-align: right;
   user-select: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--code-size);
+  line-height: var(--code-line-height);
 }
 
 .diff-table__sign {
   width: 1rem;
   color: #8b949e;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--code-size);
+  line-height: var(--code-line-height);
 }
 
 .diff-table__line {
@@ -187,8 +203,8 @@ code {
   background: transparent;
   overflow: visible;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: inherit;
-  line-height: 1.45;
+  font-size: var(--code-size);
+  line-height: var(--code-line-height);
 }
 
 .diff-table__code {
