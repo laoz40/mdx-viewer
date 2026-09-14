@@ -7,19 +7,31 @@ PLANNER_ROOT="${MDX_PLANNER_ROOT:-$(cd "$script_dir/.." && pwd)}"
 
 usage() {
   cat <<'EOF'
-Usage: mdxp <plan-folder|plan.mdx>
+Usage: mdxp [options] <plan-folder|plan.mdx>
 
 Opens a local MDX plan in the global mdx-planner viewer.
 
+Modes:
+  (default)       Build a self-contained HTML file and open it in a browser
+  --port PORT     Build and serve on localhost (for Tailscale Serve)
+  --serve         Build and serve on all interfaces (direct bind)
+
+Options:
+  -p, --port PORT  Localhost server port (with --port) or bind port (with --serve)
+  --no-open        Do not open a browser tab
+
+Flags may appear before or after the plan path.
+
 Examples:
   mdxp plans/auth-refactor
-  mdxp plans/auth-refactor/plan.mdx
+  mdxp --no-open plans/auth-refactor
+  mdxp --port 5199 plans/auth-refactor
+  mdxp --serve --port 5200 plans/auth-refactor
 
 Environment:
   MDX_PLANNER_ROOT   Viewer checkout (default: parent of this script's directory)
-  PLAN_PORT          Server port (default: 5199)
-  PLAN_HOST          Bind address (default: 127.0.0.1)
-  PLAN_OPEN=0        Skip opening a browser tab
+  PLAN_PORT          Default port for --serve when --port is not set
+  PLAN_OPEN          Override open behavior when --no-open is not set
 EOF
 }
 
@@ -40,12 +52,94 @@ resolve_plan_file() {
   exit 1
 }
 
-case "${1:-}" in
-  -h|--help|'')
-    usage
-    [[ -n "${1:-}" ]] || exit 1
-    ;;
-esac
+validate_port() {
+  local value="$1"
+  if ! [[ "$value" =~ ^[0-9]+$ ]] || (( value < 1 || value > 65535 )); then
+    echo "error: invalid port: $value" >&2
+    exit 1
+  fi
+}
+
+mode="default"
+plan_target=""
+port=""
+port_flag=0
+no_open=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --serve)
+      if [[ "$mode" == "listen" ]]; then
+        echo "error: use only one of --port or --serve" >&2
+        exit 1
+      fi
+      mode="serve"
+      shift
+      ;;
+    -p|--port)
+      if [[ -z "${2:-}" ]]; then
+        echo "error: --port requires a value" >&2
+        exit 1
+      fi
+      if [[ "$mode" == "serve" ]]; then
+        port="$2"
+        port_flag=1
+        shift 2
+        continue
+      fi
+      if [[ "$mode" != "default" ]]; then
+        echo "error: --port specified more than once" >&2
+        exit 1
+      fi
+      mode="listen"
+      port="$2"
+      port_flag=1
+      shift 2
+      ;;
+    --port=*)
+      if [[ "$mode" == "serve" ]]; then
+        port="${1#*=}"
+        port_flag=1
+        shift
+        continue
+      fi
+      if [[ "$mode" != "default" ]]; then
+        echo "error: --port specified more than once" >&2
+        exit 1
+      fi
+      mode="listen"
+      port="${1#*=}"
+      port_flag=1
+      shift
+      ;;
+    --no-open)
+      no_open=1
+      shift
+      ;;
+    -*)
+      echo "error: unknown option: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+    *)
+      if [[ -n "$plan_target" ]]; then
+        echo "error: unexpected argument: $1" >&2
+        exit 1
+      fi
+      plan_target="$1"
+      shift
+      ;;
+  esac
+done
+
+if [[ -z "$plan_target" ]]; then
+  usage
+  exit 1
+fi
 
 if [[ ! -d "$PLANNER_ROOT" ]]; then
   echo "error: mdx-planner not found at $PLANNER_ROOT" >&2
@@ -53,10 +147,38 @@ if [[ ! -d "$PLANNER_ROOT" ]]; then
   exit 1
 fi
 
-plan_file="$(resolve_plan_file "$1")"
+plan_file="$(resolve_plan_file "$plan_target")"
 export PLAN_FILE="$plan_file"
-export PLAN_OPEN="${PLAN_OPEN:-1}"
-export PLAN_PORT="${PLAN_PORT:-5199}"
+export PLAN_MODE="$mode"
+export PLAN_PORT="${port:-${PLAN_PORT:-5199}}"
+validate_port "$PLAN_PORT"
+
+case "$mode" in
+  default)
+    export PLAN_HOST="127.0.0.1"
+    if [[ "$no_open" == 1 ]]; then
+      export PLAN_OPEN=0
+    else
+      export PLAN_OPEN="${PLAN_OPEN:-1}"
+    fi
+    ;;
+  listen)
+    export PLAN_HOST="127.0.0.1"
+    if [[ "$no_open" == 1 ]]; then
+      export PLAN_OPEN=0
+    else
+      export PLAN_OPEN="${PLAN_OPEN:-0}"
+    fi
+    ;;
+  serve)
+    export PLAN_HOST="0.0.0.0"
+    if [[ "$no_open" == 1 ]]; then
+      export PLAN_OPEN=0
+    else
+      export PLAN_OPEN="${PLAN_OPEN:-0}"
+    fi
+    ;;
+esac
 
 cd "$PLANNER_ROOT"
 
@@ -64,9 +186,5 @@ if [[ ! -d node_modules ]]; then
   echo "installing mdx-planner dependencies..."
   pnpm install
 fi
-
-echo "plan: $plan_file"
-echo "viewer: $PLANNER_ROOT"
-echo "url: http://localhost:${PLAN_PORT}"
 
 exec pnpm dev
