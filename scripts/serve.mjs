@@ -93,21 +93,32 @@ function browserEnv() {
   }
 
   const runtimeDir = process.env.XDG_RUNTIME_DIR;
-  if (!runtimeDir) {
-    return process.env;
+  if (runtimeDir) {
+    try {
+      const wayland = readdirSync(runtimeDir)
+        .filter((name) => /^wayland-\d+$/.test(name))
+        .sort((a, b) => Number(a.slice(8)) - Number(b.slice(8)))
+        .at(-1);
+
+      if (wayland) {
+        return { ...process.env, WAYLAND_DISPLAY: wayland };
+      }
+    } catch {
+      // no runtime dir access
+    }
   }
 
   try {
-    const wayland = readdirSync(runtimeDir)
-      .filter((name) => /^wayland-\d+$/.test(name))
-      .sort((a, b) => Number(a.slice(8)) - Number(b.slice(8)))
+    const x11 = readdirSync("/tmp/.X11-unix")
+      .filter((name) => /^X\d+$/.test(name))
+      .sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)))
       .at(-1);
 
-    if (wayland) {
-      return { ...process.env, WAYLAND_DISPLAY: wayland };
+    if (x11) {
+      return { ...process.env, DISPLAY: `:${x11.slice(1)}` };
     }
   } catch {
-    // no runtime dir access
+    // no x11 socket dir
   }
 
   return process.env;
