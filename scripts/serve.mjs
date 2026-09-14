@@ -186,8 +186,6 @@ async function serve(htmlFile) {
     });
   });
 
-  console.log(`plan: ${planFile}`);
-  console.log(`output: ${htmlFile}`);
   if (host === "0.0.0.0") {
     console.log(`listening: http://0.0.0.0:${port}`);
     console.log(`local: http://localhost:${port}`);
