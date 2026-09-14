@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
+import { readdirSync } from "node:fs";
 import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
@@ -86,6 +87,32 @@ async function build() {
   await cp(path.join(root, "public/favicon.svg"), path.join(outDir, "favicon.svg"));
 }
 
+function browserEnv() {
+  if (process.env.WAYLAND_DISPLAY || process.env.DISPLAY) {
+    return process.env;
+  }
+
+  const runtimeDir = process.env.XDG_RUNTIME_DIR;
+  if (!runtimeDir) {
+    return process.env;
+  }
+
+  try {
+    const wayland = readdirSync(runtimeDir)
+      .filter((name) => /^wayland-\d+$/.test(name))
+      .sort((a, b) => Number(a.slice(8)) - Number(b.slice(8)))
+      .at(-1);
+
+    if (wayland) {
+      return { ...process.env, WAYLAND_DISPLAY: wayland };
+    }
+  } catch {
+    // no runtime dir access
+  }
+
+  return process.env;
+}
+
 function openUrl(url) {
   try {
     const platform = process.platform;
@@ -97,7 +124,7 @@ function openUrl(url) {
       execFileSync("cmd", ["/c", "start", "", url], { stdio: "ignore" });
       return;
     }
-    execFileSync("xdg-open", [url], { stdio: "ignore" });
+    execFileSync("xdg-open", [url], { stdio: "ignore", env: browserEnv() });
   } catch {
     console.warn(`could not open browser automatically; visit ${url}`);
   }
