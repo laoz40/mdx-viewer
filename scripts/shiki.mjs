@@ -1,22 +1,18 @@
-import {
-  createHighlighter,
-  type BundledLanguage,
-  type Highlighter,
-  type ThemedToken,
-} from "shiki";
+import { createHighlighter } from "shiki";
 
 const THEME = "tokyo-night";
 
-const LANG_ALIASES: Record<string, string> = {
+const LANG_ALIASES = {
   ts: "typescript",
   js: "javascript",
   py: "python",
   sh: "bash",
 };
 
-let highlighter: Highlighter | null = null;
+/** @type {import("shiki").Highlighter | null} */
+let highlighter = null;
 
-async function getHighlighter(): Promise<Highlighter> {
+async function getHighlighter() {
   if (!highlighter) {
     highlighter = await createHighlighter({
       themes: [THEME],
@@ -43,27 +39,24 @@ async function getHighlighter(): Promise<Highlighter> {
   return highlighter;
 }
 
-function normalizeLanguage(language: string): string {
+function normalizeLanguage(language) {
   const lowered = language.toLowerCase();
   return LANG_ALIASES[lowered] ?? lowered;
 }
 
-function resolveLanguage(hl: Highlighter, language: string): BundledLanguage | "text" {
+function resolveLanguage(hl, language) {
   const lang = normalizeLanguage(language);
-  return hl.getLoadedLanguages().includes(lang as BundledLanguage) ? (lang as BundledLanguage) : "text";
+  return hl.getLoadedLanguages().includes(lang) ? lang : "text";
 }
 
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+function escapeHtml(text) {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function themedTokensToHtml(tokens: ThemedToken[]): string {
+function themedTokensToHtml(tokens) {
   return tokens
     .map((token) => {
-      const styles: string[] = [];
+      const styles = [];
       if (token.color) styles.push(`color:${token.color}`);
       if (token.bgColor) styles.push(`background-color:${token.bgColor}`);
       if (token.fontStyle) {
@@ -77,13 +70,13 @@ function themedTokensToHtml(tokens: ThemedToken[]): string {
     .join("");
 }
 
-export async function highlightCode(code: string, language = "text"): Promise<string> {
+export async function highlightCode(code, language = "text") {
   const hl = await getHighlighter();
   const lang = resolveLanguage(hl, language);
   return hl.codeToHtml(code, { lang, theme: THEME });
 }
 
-export async function highlightCodeLines(code: string, language = "text"): Promise<string[]> {
+export async function highlightCodeLines(code, language = "text") {
   const hl = await getHighlighter();
   const lang = resolveLanguage(hl, language);
   const normalized = code.endsWith("\n") ? code : `${code}\n`;

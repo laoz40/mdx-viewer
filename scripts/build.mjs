@@ -5,6 +5,8 @@ import * as esbuild from "esbuild";
 import mdx from "@mdx-js/esbuild";
 import remarkGfm from "remark-gfm";
 
+import { remarkPrehighlight } from "./remark-prehighlight.mjs";
+
 export function pageTitle(mdxPath) {
   const baseName = path.basename(mdxPath);
   if (baseName === "plan.mdx" || baseName === "plan.md") {
@@ -54,7 +56,7 @@ export async function build({ root, mdxPath, outDir, metafile = false }) {
     plugins: [
       mdx({
         providerImportSource: "@mdx-js/react",
-        remarkPlugins: [remarkGfm],
+        remarkPlugins: [remarkGfm, remarkPrehighlight],
       }),
     ],
     alias: {
@@ -70,8 +72,7 @@ export async function build({ root, mdxPath, outDir, metafile = false }) {
     throw new Error("esbuild did not emit JavaScript output");
   }
 
-  const css =
-    result.outputFiles.find((file) => file.path.endsWith(".css"))?.text ?? "";
+  const css = result.outputFiles.find((file) => file.path.endsWith(".css"))?.text ?? "";
   const faviconSvg = await readFile(path.join(root, "public/favicon.svg"), "utf8");
   const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
   const title = escapeHtml(pageTitle(mdxPath));

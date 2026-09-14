@@ -10,13 +10,10 @@ import { build } from "./build.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const mdxFile = process.env.MDXV_FILE;
-const mdxPath = mdxFile
-  ? path.resolve(mdxFile)
-  : path.resolve(root, "example/example.mdx");
+const mdxPath = mdxFile ? path.resolve(mdxFile) : path.resolve(root, "example/example.mdx");
 const mode = process.env.MDXV_MODE ?? "default";
 const port = Number(process.env.MDXV_PORT ?? 5199);
-const host =
-  process.env.MDXV_HOST ?? (mode === "serve" ? "0.0.0.0" : "127.0.0.1");
+const host = process.env.MDXV_HOST ?? (mode === "serve" ? "0.0.0.0" : "127.0.0.1");
 const openBrowser = process.env.MDXV_OPEN !== "0";
 const outDir = path.join(root, ".mdxv-out");
 
@@ -102,8 +99,7 @@ async function serve(htmlFile) {
   }
   console.log("press Ctrl+C to stop");
 
-  const openUrlTarget =
-    host === "0.0.0.0" ? `http://localhost:${port}` : `http://${host}:${port}`;
+  const openUrlTarget = host === "0.0.0.0" ? `http://localhost:${port}` : `http://${host}:${port}`;
   if (openBrowser) {
     openUrl(openUrlTarget);
   }

@@ -1,8 +1,7 @@
 import { diffLines } from "diff";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { parseLineRange } from "../lib/lines";
-import { highlightCodeLines } from "../lib/shiki";
 import type { DiffAnnotation } from "../types";
 
 type DiffProps = {
@@ -14,6 +13,8 @@ type DiffProps = {
   after: string;
   mode?: "unified" | "split";
   annotations?: DiffAnnotation[];
+  beforeHighlights: string[];
+  afterHighlights: string[];
 };
 
 type DiffRow = {
@@ -102,13 +103,7 @@ type HighlightedLines = {
   after: string[];
 };
 
-function DiffLine({
-  html,
-  fallback,
-}: {
-  html?: string;
-  fallback: string;
-}) {
+function DiffLine({ html, fallback }: { html?: string; fallback: string }) {
   return (
     <span className="diff-line-wrap">
       <div className="diff-line-pre">
@@ -142,23 +137,20 @@ function SplitPane({
         <table className="diff-table">
           <tbody>
             {rows.map((row, index) => {
-            const lineNo = side === "before" ? row.beforeNo : row.afterNo;
-            const line = side === "before" ? row.beforeLine : row.afterLine;
-            const note = annotationForLine(annotations, side, lineNo);
-            const html =
-              lineNo !== undefined
-                ? highlights[side][lineNo - 1]
-                : undefined;
+              const lineNo = side === "before" ? row.beforeNo : row.afterNo;
+              const line = side === "before" ? row.beforeLine : row.afterLine;
+              const note = annotationForLine(annotations, side, lineNo);
+              const html = lineNo !== undefined ? highlights[side][lineNo - 1] : undefined;
 
-            return (
-              <tr key={`${side}-${row.kind}-${index}`} className={splitRowClass(side, row.kind)}>
-                <td className="diff-table__gutter">{lineNo ?? ""}</td>
-                <td className="diff-table__line">
-                  <DiffLine html={html} fallback={line ?? ""} />
-                  {note && <DiffAnnotationNote note={note} />}
-                </td>
-              </tr>
-            );
+              return (
+                <tr key={`${side}-${row.kind}-${index}`} className={splitRowClass(side, row.kind)}>
+                  <td className="diff-table__gutter">{lineNo ?? ""}</td>
+                  <td className="diff-table__line">
+                    <DiffLine html={html} fallback={line ?? ""} />
+                    {note && <DiffAnnotationNote note={note} />}
+                  </td>
+                </tr>
+              );
             })}
           </tbody>
         </table>
@@ -170,27 +162,15 @@ function SplitPane({
 export function Diff({
   summary,
   filename,
-  language = "text",
   before,
   after,
   mode = "unified",
   annotations,
+  beforeHighlights,
+  afterHighlights,
 }: DiffProps) {
   const rows = useMemo(() => buildRows(before, after), [before, after]);
-  const [highlights, setHighlights] = useState<HighlightedLines>({ before: [], after: [] });
-
-  useEffect(() => {
-    let cancelled = false;
-    void Promise.all([
-      highlightCodeLines(before, language),
-      highlightCodeLines(after, language),
-    ]).then(([beforeLines, afterLines]) => {
-      if (!cancelled) setHighlights({ before: beforeLines, after: afterLines });
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [before, after, language]);
+  const highlights: HighlightedLines = { before: beforeHighlights, after: afterHighlights };
 
   return (
     <section className="diff-block">
@@ -221,30 +201,30 @@ export function Diff({
           <table className="diff-table">
             <tbody>
               {rows.map((row, index) => {
-              const beforeNote = annotationForLine(annotations, "before", row.beforeNo);
-              const afterNote = annotationForLine(annotations, "after", row.afterNo);
-              const note = afterNote ?? beforeNote;
-              const line = row.afterLine ?? row.beforeLine ?? "";
-              const html =
-                row.kind === "remove" && row.beforeNo !== undefined
-                  ? highlights.before[row.beforeNo - 1]
-                  : row.afterNo !== undefined
-                    ? highlights.after[row.afterNo - 1]
-                    : undefined;
+                const beforeNote = annotationForLine(annotations, "before", row.beforeNo);
+                const afterNote = annotationForLine(annotations, "after", row.afterNo);
+                const note = afterNote ?? beforeNote;
+                const line = row.afterLine ?? row.beforeLine ?? "";
+                const html =
+                  row.kind === "remove" && row.beforeNo !== undefined
+                    ? highlights.before[row.beforeNo - 1]
+                    : row.afterNo !== undefined
+                      ? highlights.after[row.afterNo - 1]
+                      : undefined;
 
-              return (
-                <tr key={`${row.kind}-${index}`} className={diffRowClass(row.kind)}>
-                  <td className="diff-table__gutter">{row.beforeNo ?? ""}</td>
-                  <td className="diff-table__gutter">{row.afterNo ?? ""}</td>
-                  <td className="diff-table__sign">
-                    {row.kind === "add" ? "+" : row.kind === "remove" ? "-" : " "}
-                  </td>
-                  <td className="diff-table__line">
-                    <DiffLine html={html} fallback={line} />
-                    {note && <DiffAnnotationNote note={note} />}
-                  </td>
-                </tr>
-              );
+                return (
+                  <tr key={`${row.kind}-${index}`} className={diffRowClass(row.kind)}>
+                    <td className="diff-table__gutter">{row.beforeNo ?? ""}</td>
+                    <td className="diff-table__gutter">{row.afterNo ?? ""}</td>
+                    <td className="diff-table__sign">
+                      {row.kind === "add" ? "+" : row.kind === "remove" ? "-" : " "}
+                    </td>
+                    <td className="diff-table__line">
+                      <DiffLine html={html} fallback={line} />
+                      {note && <DiffAnnotationNote note={note} />}
+                    </td>
+                  </tr>
+                );
               })}
             </tbody>
           </table>

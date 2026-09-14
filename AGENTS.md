@@ -22,4 +22,4 @@ When editing docs, the mdx skill, CLI help, or examples, do not imply plan-only 
 ## Verify changes
 
 Lint and format after each change.
-Run benchmarks when appropriate to ensure bundle size or build time stays reasonable.
+Run benchmarks when appropriate to ensure bundle size stays low.

@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-
-import { highlightCode } from "../lib/shiki";
+import { useState } from "react";
 
 type CodeBlockProps = {
   code: string;
@@ -8,6 +6,7 @@ type CodeBlockProps = {
   filename?: string;
   caption?: string;
   maxLines?: number;
+  html: string;
 };
 
 export function CodeBlock({
@@ -16,20 +15,9 @@ export function CodeBlock({
   filename,
   caption,
   maxLines,
+  html,
 }: CodeBlockProps) {
-  const [html, setHtml] = useState<string>("");
   const [expanded, setExpanded] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    void highlightCode(code, language).then((result) => {
-      if (!cancelled) setHtml(result);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [code, language]);
-
   const lineCount = code.split("\n").length;
   const collapsible = typeof maxLines === "number" && maxLines > 0 && lineCount > maxLines;
 

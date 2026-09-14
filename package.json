@@ -13,8 +13,8 @@
   "dependencies": {
     "@mdx-js/esbuild": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
-    "esbuild": "^0.25.12",
     "diff": "^9.0.0",
+    "esbuild": "^0.25.12",
     "mermaid": "^11.17.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

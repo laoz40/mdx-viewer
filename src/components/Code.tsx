@@ -6,6 +6,7 @@ type CodeProps = {
   filename?: string;
   caption?: string;
   maxLines?: number;
+  html: string;
 };
 
 export function Code(props: CodeProps) {
