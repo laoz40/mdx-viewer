@@ -34,10 +34,10 @@ pnpm dev
 For agents that load skills from `~/.agents/skills/` (Cursor, pi, etc.):
 
 ```bash
-ln -sf "$(pwd)/skills/create-mdx" ~/.agents/skills/create-mdx
+ln -sf "$(pwd)/skills/mdx" ~/.agents/skills/mdx
 ```
 
-Source: [`skills/create-mdx/SKILL.md`](skills/create-mdx/SKILL.md). Tells agents how to author MDX and open it with `mdxv`.
+Source: [`skills/mdx/SKILL.md`](skills/mdx/SKILL.md). Tells agents how to author MDX and open it with `mdxv`.
 
 ## Usage
 
@@ -69,7 +69,7 @@ These tags match the visual-plan component set:
 
 `Diff`, `FileTree`, `Code`, `Callout`, `Mermaid`, `Tabs` / `Tab`.
 
-Component source: [`src/components/`](src/components/). Authoring contract: [`skills/create-mdx/SKILL.md`](skills/create-mdx/SKILL.md). Block reference: [visual-plan SKILL.md](https://github.com/BuilderIO/skills/blob/main/skills/visual-plan/SKILL.md).
+Component source: [`src/components/`](src/components/). Authoring contract: [`skills/mdx/SKILL.md`](skills/mdx/SKILL.md). Block reference: [visual-plan SKILL.md](https://github.com/BuilderIO/skills/blob/main/skills/visual-plan/SKILL.md).
 
 ## Attribution
 

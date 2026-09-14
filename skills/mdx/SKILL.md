@@ -1,5 +1,5 @@
 ---
-name: create-mdx
+name: mdx
 description: Write structured MDX documents with custom components for visual explanations, walkthroughs, diagrams, and other rich docs. Use when the user wants MDX with Diff, FileTree, Mermaid, Callouts, etc.
 ---
 
