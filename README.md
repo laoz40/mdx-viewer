@@ -44,15 +44,24 @@ Source: [`skills/create-mdx/SKILL.md`](skills/create-mdx/SKILL.md). Tells agents
 From any project with `plans/<slug>/plan.mdx`:
 
 ```bash
-mdxp plans/example
+mdxp plans/example                         # build example.html, open in browser
+mdxp --no-open plans/example             # build only, print output path
+mdxp --port 5199 plans/example           # localhost server for Tailscale Serve
+mdxp --serve --port 5200 plans/example   # direct bind on all interfaces
 ```
 
-Environment:
+Options:
+
+- `--port PORT` — build and serve on `127.0.0.1` (keeps running; use with Tailscale Serve)
+- `--serve` — build and serve on `0.0.0.0` (direct bind for LAN/Tailscale IP)
+- `-p, --port PORT` — port for `--serve` (default `5199`)
+- `--no-open` — skip opening a browser tab
+
+Environment (optional overrides):
 
 - `MDX_PLANNER_ROOT` — path to this checkout (required if the CLI is not colocated with the repo)
-- `PLAN_PORT` — server port (default `5199`)
-- `PLAN_HOST` — bind address (default `127.0.0.1`; use `0.0.0.0` for LAN/Tailscale)
-- `PLAN_OPEN=0` — do not open a browser tab
+- `PLAN_PORT` — default port for `--serve` when `-p` is not set
+- `PLAN_OPEN` — default open behavior when `--no-open` is not set
 
 ## MDX blocks
 
