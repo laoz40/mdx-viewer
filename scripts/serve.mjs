@@ -11,16 +11,16 @@ import mdx from "@mdx-js/esbuild";
 import remarkGfm from "remark-gfm";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const planFile = process.env.PLAN_FILE
-  ? path.resolve(process.env.PLAN_FILE)
-  : path.resolve(root, "example/plan.mdx");
-const mode = process.env.PLAN_MODE ?? "default";
-const port = Number(process.env.PLAN_PORT ?? 5199);
+const mdxFile = process.env.MDXV_FILE;
+const mdxPath = mdxFile
+  ? path.resolve(mdxFile)
+  : path.resolve(root, "example/example.mdx");
+const mode = process.env.MDXV_MODE ?? "default";
+const port = Number(process.env.MDXV_PORT ?? 5199);
 const host =
-  process.env.PLAN_HOST ??
-  (mode === "serve" ? "0.0.0.0" : "127.0.0.1");
-const openBrowser = process.env.PLAN_OPEN !== "0";
-const outDir = path.join(root, ".mdxp-out");
+  process.env.MDXV_HOST ?? (mode === "serve" ? "0.0.0.0" : "127.0.0.1");
+const openBrowser = process.env.MDXV_OPEN !== "0";
+const outDir = path.join(root, ".mdxv-out");
 
 function escapeHtml(text) {
   return text
@@ -31,29 +31,29 @@ function escapeHtml(text) {
 }
 
 function pageTitle() {
-  const planBaseName = path.basename(planFile);
-  if (planBaseName === "plan.mdx" || planBaseName === "plan.md") {
-    return path.basename(path.dirname(planFile));
+  const baseName = path.basename(mdxPath);
+  if (baseName === "plan.mdx" || baseName === "plan.md") {
+    return path.basename(path.dirname(mdxPath));
   }
-  return planBaseName;
+  return baseName;
 }
 
 function outputFileName() {
-  const planBaseName = path.basename(planFile);
-  if (planBaseName === "plan.mdx" || planBaseName === "plan.md") {
-    return `${path.basename(path.dirname(planFile))}.html`;
+  const baseName = path.basename(mdxPath);
+  if (baseName === "plan.mdx" || baseName === "plan.md") {
+    return `${path.basename(path.dirname(mdxPath))}.html`;
   }
-  return `${path.basename(planFile, path.extname(planFile))}.html`;
+  return `${path.basename(mdxPath, path.extname(mdxPath))}.html`;
 }
 
-async function stagePlan() {
+async function stageMdx() {
   await mkdir(outDir, { recursive: true });
-  const stagedPlan = path.join(outDir, "plan.mdx");
-  await cp(planFile, stagedPlan);
-  return stagedPlan;
+  const stagedMdx = path.join(outDir, "source.mdx");
+  await cp(mdxPath, stagedMdx);
+  return stagedMdx;
 }
 
-async function build(stagedPlan) {
+async function build(stagedMdx) {
   const result = await esbuild.build({
     absWorkingDir: root,
     entryPoints: [path.join(root, "src/main.tsx")],
@@ -72,7 +72,7 @@ async function build(stagedPlan) {
       }),
     ],
     alias: {
-      "@plan": stagedPlan,
+      "@plan": stagedMdx,
     },
     loader: {
       ".css": "css",
@@ -209,10 +209,10 @@ async function serve(htmlFile) {
 }
 
 console.log("building...");
-const stagedPlan = await stagePlan();
-const htmlFile = await build(stagedPlan);
+const stagedMdx = await stageMdx();
+const htmlFile = await build(stagedMdx);
 
-console.log(`plan: ${planFile}`);
+console.log(`input: ${mdxPath}`);
 console.log(`output: ${htmlFile}`);
 
 if (mode === "default") {

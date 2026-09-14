@@ -3,13 +3,13 @@ set -euo pipefail
 
 script_path="$(readlink -f "${BASH_SOURCE[0]}")"
 script_dir="$(cd "$(dirname "$script_path")" && pwd)"
-PLANNER_ROOT="${MDX_PLANNER_ROOT:-$(cd "$script_dir/.." && pwd)}"
+VIEWER_ROOT="${MDXV_ROOT:-$(cd "$script_dir/.." && pwd)}"
 
 usage() {
   cat <<'EOF'
-Usage: mdxp [options] <plan-folder|plan.mdx>
+Usage: mdxv [options] <folder|file.mdx>
 
-Opens a local MDX plan in the global mdx-planner viewer.
+Build and view an MDX document with the global mdx-planner viewer.
 
 Modes:
   (default)       Build a self-contained HTML file and open it in a browser
@@ -20,22 +20,22 @@ Options:
   -p, --port PORT  Localhost server port (with --port) or bind port (with --serve)
   --no-open        Do not open a browser tab
 
-Flags may appear before or after the plan path.
+Flags may appear before or after the document path.
 
 Examples:
-  mdxp plans/auth-refactor
-  mdxp --no-open plans/auth-refactor
-  mdxp --port 5199 plans/auth-refactor
-  mdxp --serve --port 5200 plans/auth-refactor
+  mdxv docs/guide.mdx
+  mdxv --no-open plans/auth-refactor/plan.mdx
+  mdxv --port 5199 docs/guide.mdx
+  mdxv --serve -p 5200 example/example.mdx
 
 Environment:
-  MDX_PLANNER_ROOT   Viewer checkout (default: parent of this script's directory)
-  PLAN_PORT          Default port for --serve when --port is not set
-  PLAN_OPEN          Override open behavior when --no-open is not set
+  MDXV_ROOT        Viewer checkout (default: parent of this script's directory)
+  MDXV_PORT        Default port for --serve when -p is not set
+  MDXV_OPEN        Override open behavior when --no-open is not set
 EOF
 }
 
-resolve_plan_file() {
+resolve_mdx_file() {
   local target="$1"
 
   if [[ -f "$target" && "$target" == *.mdx ]]; then
@@ -43,12 +43,22 @@ resolve_plan_file() {
     return 0
   fi
 
-  if [[ -d "$target" && -f "$target/plan.mdx" ]]; then
-    realpath "$target/plan.mdx"
-    return 0
+  if [[ -d "$target" ]]; then
+    local folder_name
+    folder_name="$(basename "$target")"
+
+    if [[ -f "$target/plan.mdx" ]]; then
+      realpath "$target/plan.mdx"
+      return 0
+    fi
+
+    if [[ -f "$target/${folder_name}.mdx" ]]; then
+      realpath "$target/${folder_name}.mdx"
+      return 0
+    fi
   fi
 
-  echo "error: expected a plan folder with plan.mdx or a .mdx file: $target" >&2
+  echo "error: expected a .mdx file or a folder containing plan.mdx or <folder>.mdx: $target" >&2
   exit 1
 }
 
@@ -61,7 +71,7 @@ validate_port() {
 }
 
 mode="default"
-plan_target=""
+mdx_target=""
 port=""
 port_flag=0
 no_open=0
@@ -126,64 +136,64 @@ while [[ $# -gt 0 ]]; do
       exit 1
       ;;
     *)
-      if [[ -n "$plan_target" ]]; then
+      if [[ -n "$mdx_target" ]]; then
         echo "error: unexpected argument: $1" >&2
         exit 1
       fi
-      plan_target="$1"
+      mdx_target="$1"
       shift
       ;;
   esac
 done
 
-if [[ -z "$plan_target" ]]; then
+if [[ -z "$mdx_target" ]]; then
   usage
   exit 1
 fi
 
-if [[ ! -d "$PLANNER_ROOT" ]]; then
-  echo "error: mdx-planner not found at $PLANNER_ROOT" >&2
-  echo "set MDX_PLANNER_ROOT to your mdx-planner checkout" >&2
+if [[ ! -d "$VIEWER_ROOT" ]]; then
+  echo "error: viewer not found at $VIEWER_ROOT" >&2
+  echo "set MDXV_ROOT to your mdx-planner checkout" >&2
   exit 1
 fi
 
-plan_file="$(resolve_plan_file "$plan_target")"
-export PLAN_FILE="$plan_file"
-export PLAN_MODE="$mode"
-export PLAN_PORT="${port:-${PLAN_PORT:-5199}}"
-validate_port "$PLAN_PORT"
+mdx_file="$(resolve_mdx_file "$mdx_target")"
+export MDXV_FILE="$mdx_file"
+export MDXV_MODE="$mode"
+export MDXV_PORT="${port:-${MDXV_PORT:-5199}}"
+validate_port "$MDXV_PORT"
 
 case "$mode" in
   default)
-    export PLAN_HOST="127.0.0.1"
+    export MDXV_HOST="127.0.0.1"
     if [[ "$no_open" == 1 ]]; then
-      export PLAN_OPEN=0
+      export MDXV_OPEN=0
     else
-      export PLAN_OPEN="${PLAN_OPEN:-1}"
+      export MDXV_OPEN="${MDXV_OPEN:-1}"
     fi
     ;;
   listen)
-    export PLAN_HOST="127.0.0.1"
+    export MDXV_HOST="127.0.0.1"
     if [[ "$no_open" == 1 ]]; then
-      export PLAN_OPEN=0
+      export MDXV_OPEN=0
     else
-      export PLAN_OPEN="${PLAN_OPEN:-0}"
+      export MDXV_OPEN="${MDXV_OPEN:-0}"
     fi
     ;;
   serve)
-    export PLAN_HOST="0.0.0.0"
+    export MDXV_HOST="0.0.0.0"
     if [[ "$no_open" == 1 ]]; then
-      export PLAN_OPEN=0
+      export MDXV_OPEN=0
     else
-      export PLAN_OPEN="${PLAN_OPEN:-0}"
+      export MDXV_OPEN="${MDXV_OPEN:-0}"
     fi
     ;;
 esac
 
-cd "$PLANNER_ROOT"
+cd "$VIEWER_ROOT"
 
 if [[ ! -d node_modules ]]; then
-  echo "installing mdx-planner dependencies..."
+  echo "installing viewer dependencies..."
   pnpm install
 fi
 
