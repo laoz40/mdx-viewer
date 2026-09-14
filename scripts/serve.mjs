@@ -87,16 +87,20 @@ async function build() {
 }
 
 function openUrl(url) {
-  const platform = process.platform;
-  if (platform === "darwin") {
-    execFileSync("open", [url]);
-    return;
+  try {
+    const platform = process.platform;
+    if (platform === "darwin") {
+      execFileSync("open", [url], { stdio: "ignore" });
+      return;
+    }
+    if (platform === "win32") {
+      execFileSync("cmd", ["/c", "start", "", url], { stdio: "ignore" });
+      return;
+    }
+    execFileSync("xdg-open", [url], { stdio: "ignore" });
+  } catch {
+    console.warn(`could not open browser automatically; visit ${url}`);
   }
-  if (platform === "win32") {
-    execFileSync("cmd", ["/c", "start", "", url], { stdio: "ignore" });
-    return;
-  }
-  execFileSync("xdg-open", [url], { stdio: "ignore" });
 }
 
 function safePath(urlPath) {
