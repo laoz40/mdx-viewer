@@ -4,7 +4,7 @@ import { readdirSync } from "node:fs";
 import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import * as esbuild from "esbuild";
 import mdx from "@mdx-js/esbuild";
@@ -14,40 +14,57 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const planFile = process.env.PLAN_FILE
   ? path.resolve(process.env.PLAN_FILE)
   : path.resolve(root, "example/plan.mdx");
+const mode = process.env.PLAN_MODE ?? "default";
 const port = Number(process.env.PLAN_PORT ?? 5199);
-const host = process.env.PLAN_HOST ?? "127.0.0.1";
+const host =
+  process.env.PLAN_HOST ??
+  (mode === "serve" ? "0.0.0.0" : "127.0.0.1");
 const openBrowser = process.env.PLAN_OPEN !== "0";
 const outDir = path.join(root, ".mdxp-out");
 
-const mimeTypes = {
-  ".css": "text/css; charset=utf-8",
-  ".html": "text/html; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".map": "application/json; charset=utf-8",
-  ".svg": "image/svg+xml",
-};
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function pageTitle() {
+  const planBaseName = path.basename(planFile);
+  if (planBaseName === "plan.mdx" || planBaseName === "plan.md") {
+    return path.basename(path.dirname(planFile));
+  }
+  return planBaseName;
+}
+
+function outputFileName() {
+  const planBaseName = path.basename(planFile);
+  if (planBaseName === "plan.mdx" || planBaseName === "plan.md") {
+    return `${path.basename(path.dirname(planFile))}.html`;
+  }
+  return `${path.basename(planFile, path.extname(planFile))}.html`;
+}
 
 async function stagePlan() {
+  await mkdir(outDir, { recursive: true });
   const stagedPlan = path.join(outDir, "plan.mdx");
   await cp(planFile, stagedPlan);
   return stagedPlan;
 }
 
-async function build() {
-  await mkdir(outDir, { recursive: true });
-  const stagedPlan = await stagePlan();
-
-  await esbuild.build({
+async function build(stagedPlan) {
+  const result = await esbuild.build({
     absWorkingDir: root,
     entryPoints: [path.join(root, "src/main.tsx")],
     bundle: true,
-    outfile: path.join(outDir, "main.js"),
-    format: "esm",
+    write: false,
+    format: "iife",
+    outfile: path.join(outDir, "bundle.js"),
     platform: "browser",
     target: "es2022",
     jsx: "automatic",
     jsxImportSource: "react",
-    sourcemap: true,
     plugins: [
       mdx({
         providerImportSource: "@mdx-js/react",
@@ -62,29 +79,37 @@ async function build() {
     },
   });
 
-  const planBaseName = path.basename(planFile);
-  const pageTitle =
-    planBaseName === "plan.mdx" || planBaseName === "plan.md"
-      ? path.basename(path.dirname(planFile))
-      : planBaseName;
+  const js = result.outputFiles.find((file) => file.path.endsWith(".js"))?.text;
+  if (!js) {
+    throw new Error("esbuild did not emit JavaScript output");
+  }
+
+  const css =
+    result.outputFiles.find((file) => file.path.endsWith(".css"))?.text ?? "";
+  const faviconSvg = await readFile(path.join(root, "public/favicon.svg"), "utf8");
+  const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
+  const title = escapeHtml(pageTitle());
+  const safeJs = js.replace(/<\/script/gi, "<\\/script");
+
   const html = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="${faviconHref}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${pageTitle}</title>
-    <link rel="stylesheet" href="/main.css" />
+    <title>${title}</title>
+    <style>${css}</style>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/main.js"></script>
+    <script>${safeJs}</script>
   </body>
 </html>
 `;
 
-  await writeFile(path.join(outDir, "index.html"), html);
-  await cp(path.join(root, "public/favicon.svg"), path.join(outDir, "favicon.svg"));
+  const htmlFile = path.join(outDir, outputFileName());
+  await writeFile(htmlFile, html);
+  return htmlFile;
 }
 
 function browserEnv() {
@@ -137,39 +162,20 @@ function openUrl(url) {
     }
     execFileSync("xdg-open", [url], { stdio: "ignore", env: browserEnv() });
   } catch {
-    console.warn(`could not open browser automatically; visit ${url}`);
+    console.warn(`could not open browser automatically; open ${url}`);
   }
 }
 
-function safePath(urlPath) {
-  const normalized = path.normalize(urlPath).replace(/^(\.\.(\/|\\|$))+/, "");
-  const filePath = path.join(outDir, normalized);
-  if (!filePath.startsWith(outDir)) {
-    return null;
-  }
-  return filePath;
+function openFile(filePath) {
+  openUrl(pathToFileURL(filePath).href);
 }
 
-async function serve() {
-  const server = createServer(async (req, res) => {
-    try {
-      const urlPath = req.url?.split("?")[0] ?? "/";
-      const relativePath = urlPath === "/" ? "index.html" : urlPath.slice(1);
-      const filePath = safePath(relativePath);
-      if (!filePath) {
-        res.writeHead(403);
-        res.end("Forbidden");
-        return;
-      }
+async function serve(htmlFile) {
+  const body = await readFile(htmlFile);
 
-      const body = await readFile(filePath);
-      const ext = path.extname(filePath);
-      res.writeHead(200, { "Content-Type": mimeTypes[ext] ?? "application/octet-stream" });
-      res.end(body);
-    } catch {
-      res.writeHead(404);
-      res.end("Not found");
-    }
+  const server = createServer((req, res) => {
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(body);
   });
 
   await new Promise((resolve, reject) => {
@@ -180,13 +186,20 @@ async function serve() {
     });
   });
 
-  const url = `http://${host === "0.0.0.0" ? "localhost" : host}:${port}`;
   console.log(`plan: ${planFile}`);
-  console.log(`url: ${url}`);
+  console.log(`output: ${htmlFile}`);
+  if (host === "0.0.0.0") {
+    console.log(`listening: http://0.0.0.0:${port}`);
+    console.log(`local: http://localhost:${port}`);
+  } else {
+    console.log(`url: http://${host}:${port}`);
+  }
   console.log("press Ctrl+C to stop");
 
+  const openUrlTarget =
+    host === "0.0.0.0" ? `http://localhost:${port}` : `http://${host}:${port}`;
   if (openBrowser) {
-    openUrl(url);
+    openUrl(openUrlTarget);
   }
 
   const shutdown = () => {
@@ -198,5 +211,17 @@ async function serve() {
 }
 
 console.log("building...");
-await build();
-await serve();
+const stagedPlan = await stagePlan();
+const htmlFile = await build(stagedPlan);
+
+console.log(`plan: ${planFile}`);
+console.log(`output: ${htmlFile}`);
+
+if (mode === "default") {
+  if (openBrowser) {
+    openFile(htmlFile);
+  }
+  process.exit(0);
+}
+
+await serve(htmlFile);
