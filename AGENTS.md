@@ -18,3 +18,8 @@ When editing docs, the mdx skill, CLI help, or examples, do not imply plan-only 
 - `scripts/serve.mjs` — build and serve
 - `bin/mdxv` — CLI
 - `skills/mdx/` — agent authoring skill
+
+## Verify changes
+
+Lint and format after each change.
+Run benchmarks when appropriate to ensure bundle size or build time stays reasonable.

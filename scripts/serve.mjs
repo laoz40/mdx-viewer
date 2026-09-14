@@ -1,14 +1,12 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
 import { readdirSync } from "node:fs";
-import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import * as esbuild from "esbuild";
-import mdx from "@mdx-js/esbuild";
-import remarkGfm from "remark-gfm";
+import { build } from "./build.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const mdxFile = process.env.MDXV_FILE;
@@ -21,96 +19,6 @@ const host =
   process.env.MDXV_HOST ?? (mode === "serve" ? "0.0.0.0" : "127.0.0.1");
 const openBrowser = process.env.MDXV_OPEN !== "0";
 const outDir = path.join(root, ".mdxv-out");
-
-function escapeHtml(text) {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function pageTitle() {
-  const baseName = path.basename(mdxPath);
-  if (baseName === "plan.mdx" || baseName === "plan.md") {
-    return path.basename(path.dirname(mdxPath));
-  }
-  return baseName;
-}
-
-function outputFileName() {
-  const baseName = path.basename(mdxPath);
-  if (baseName === "plan.mdx" || baseName === "plan.md") {
-    return `${path.basename(path.dirname(mdxPath))}.html`;
-  }
-  return `${path.basename(mdxPath, path.extname(mdxPath))}.html`;
-}
-
-async function stageMdx() {
-  await mkdir(outDir, { recursive: true });
-  const stagedMdx = path.join(outDir, "source.mdx");
-  await cp(mdxPath, stagedMdx);
-  return stagedMdx;
-}
-
-async function build(stagedMdx) {
-  const result = await esbuild.build({
-    absWorkingDir: root,
-    entryPoints: [path.join(root, "src/main.tsx")],
-    bundle: true,
-    write: false,
-    format: "iife",
-    outfile: path.join(outDir, "bundle.js"),
-    platform: "browser",
-    target: "es2022",
-    jsx: "automatic",
-    jsxImportSource: "react",
-    plugins: [
-      mdx({
-        providerImportSource: "@mdx-js/react",
-        remarkPlugins: [remarkGfm],
-      }),
-    ],
-    alias: {
-      "@plan": stagedMdx,
-    },
-    loader: {
-      ".css": "css",
-    },
-  });
-
-  const js = result.outputFiles.find((file) => file.path.endsWith(".js"))?.text;
-  if (!js) {
-    throw new Error("esbuild did not emit JavaScript output");
-  }
-
-  const css =
-    result.outputFiles.find((file) => file.path.endsWith(".css"))?.text ?? "";
-  const faviconSvg = await readFile(path.join(root, "public/favicon.svg"), "utf8");
-  const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
-  const title = escapeHtml(pageTitle());
-  const safeJs = js.replace(/<\/script/gi, "<\\/script");
-
-  const html = `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="${faviconHref}" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${title}</title>
-    <style>${css}</style>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script>${safeJs}</script>
-  </body>
-</html>
-`;
-
-  const htmlFile = path.join(outDir, outputFileName());
-  await writeFile(htmlFile, html);
-  return htmlFile;
-}
 
 function browserEnv() {
   if (process.env.WAYLAND_DISPLAY || process.env.DISPLAY) {
@@ -209,8 +117,7 @@ async function serve(htmlFile) {
 }
 
 console.log("building...");
-const stagedMdx = await stageMdx();
-const htmlFile = await build(stagedMdx);
+const { htmlFile } = await build({ root, mdxPath, outDir });
 
 console.log(`input: ${mdxPath}`);
 console.log(`output: ${htmlFile}`);
