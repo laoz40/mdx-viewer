@@ -1,10 +1,10 @@
-# Example plan
+# Example document
 
-Local MDX planner smoke test.
+Local MDX viewer smoke test.
 
 <Callout
   tone="decision"
-  body="Plans live in `plans/<slug>/plan.mdx` inside each repo. The viewer stays global."
+  body="Write MDX anywhere in your repo (`docs/`, `plans/`, etc.). The viewer stays global; open with `mdxv <path>`."
 />
 
 <FileTree
@@ -46,8 +46,8 @@ Local MDX planner smoke test.
 
 <Code
   language="bash"
-  code={`mdxp plans/example`}
-  caption="Open a plan from the project root"
+  code={`mdxv docs/guide.mdx\nmdxv plans/example/plan.mdx`}
+  caption="Open any MDX file from the project root"
 />
 
 <Mermaid

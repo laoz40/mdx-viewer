@@ -9,7 +9,7 @@ description: Write structured MDX documents with custom components for visual ex
 
 Write MDX to a path in the current project (e.g. `docs/<slug>.mdx` or a path the user specifies).
 
-- Open locally with `mdxp <path>` from the project root.
+- Open locally with `mdxv <path>` from the project root.
 - Do not add npm deps to the project. Do not copy React components into the repo.
 
 ## Authoring rules

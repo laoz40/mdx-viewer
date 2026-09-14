@@ -1,8 +1,8 @@
 # mdx-planner
 
-Local MDX viewer for coding plans. No hosted UI, no per-project npm deps.
+Local MDX viewer for rich documents (plans, guides, walkthroughs, demos). No hosted UI, no per-project npm deps.
 
-MDX components in `src/components/` follow the [visual-plan](https://github.com/BuilderIO/skills/tree/main/skills/visual-plan) block catalog from [BuilderIO/skills](https://github.com/BuilderIO/skills). See `example/plan.mdx` for a component demo.
+MDX components in `src/components/` follow the [visual-plan](https://github.com/BuilderIO/skills/tree/main/skills/visual-plan) block catalog from [BuilderIO/skills](https://github.com/BuilderIO/skills). See `example/example.mdx` for a component demo.
 
 ## Setup
 
@@ -17,15 +17,15 @@ pnpm install
 Symlink the bundled script onto your `PATH`:
 
 ```bash
-ln -sf "$(pwd)/bin/mdxp" ~/.local/bin/mdxp
+ln -sf "$(pwd)/bin/mdxv" ~/.local/bin/mdxv
 ```
 
-`mdxp` resolves this checkout from the script location. Set `MDX_PLANNER_ROOT` if you symlink or copy it somewhere else.
+`mdxv` resolves this checkout from the script location. Set `MDXV_ROOT` if you symlink or copy it somewhere else.
 
 Without the CLI:
 
 ```bash
-export PLAN_FILE=/path/to/plan.mdx
+export MDXV_FILE=/path/to/document.mdx
 pnpm dev
 ```
 
@@ -37,17 +37,17 @@ For agents that load skills from `~/.agents/skills/` (Cursor, pi, etc.):
 ln -sf "$(pwd)/skills/create-mdx" ~/.agents/skills/create-mdx
 ```
 
-Source: [`skills/create-mdx/SKILL.md`](skills/create-mdx/SKILL.md). Tells agents how to author MDX and open it with `mdxp`.
+Source: [`skills/create-mdx/SKILL.md`](skills/create-mdx/SKILL.md). Tells agents how to author MDX and open it with `mdxv`.
 
 ## Usage
 
-From any project with `plans/<slug>/plan.mdx`:
+From any project with an MDX file:
 
 ```bash
-mdxp plans/example                         # build example.html, open in browser
-mdxp --no-open plans/example             # build only, print output path
-mdxp --port 5199 plans/example           # localhost server for Tailscale Serve
-mdxp --serve --port 5200 plans/example   # direct bind on all interfaces
+mdxv docs/guide.mdx                       # build guide.html, open in browser
+mdxv --no-open plans/example/plan.mdx     # build only, print output path
+mdxv --port 5199 docs/guide.mdx           # localhost server for Tailscale Serve
+mdxv --serve -p 5200 docs/guide.mdx       # direct bind on all interfaces
 ```
 
 Options:
@@ -59,9 +59,9 @@ Options:
 
 Environment (optional overrides):
 
-- `MDX_PLANNER_ROOT` — path to this checkout (required if the CLI is not colocated with the repo)
-- `PLAN_PORT` — default port for `--serve` when `-p` is not set
-- `PLAN_OPEN` — default open behavior when `--no-open` is not set
+- `MDXV_ROOT` — path to this checkout (required if the CLI is not colocated with the repo)
+- `MDXV_PORT` — default port for `--serve` when `-p` is not set
+- `MDXV_OPEN` — default open behavior when `--no-open` is not set
 
 ## MDX blocks
 
