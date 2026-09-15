@@ -3,15 +3,15 @@ set -euo pipefail
 
 script_path="$(readlink -f "${BASH_SOURCE[0]}")"
 script_dir="$(cd "$(dirname "$script_path")" && pwd)"
-VIEWER_ROOT="${MDXV_ROOT:-$(cd "$script_dir/.." && pwd)}"
+VIEWER_ROOT="${MDXP_ROOT:-$(cd "$script_dir/.." && pwd)}"
 
 usage() {
   cat <<'EOF'
-Usage: mdxv [options] <folder|file.mdx>
-       mdxv setup
-       mdxv --components
+Usage: mdxp [options] <folder|file.mdx>
+       mdxp setup
+       mdxp --components
 
-Build and view an MDX document with the global mdx-viewer install.
+Build and view an MDX document with the global mdx-planner install.
 
 Commands:
   setup            Symlink the MDX skill and verify CLI setup
@@ -31,20 +31,20 @@ Options:
 Flags may appear before or after the document path.
 
 Examples:
-  mdxv setup
-  mdxv setup --skills-dir ~/.cursor/skills
-  mdxv --components
-  mdxv docs/guide.mdx
-  mdxv docs/guide.mdx -o docs/guide.html
-  mdxv --no-open plans/auth-refactor.mdx
-  mdxv --port 5199 docs/guide.mdx
-  mdxv --serve -p 5200 example/example.mdx
+  mdxp setup
+  mdxp setup --skills-dir ~/.cursor/skills
+  mdxp --components
+  mdxp docs/guide.mdx
+  mdxp docs/guide.mdx -o docs/guide.html
+  mdxp --no-open plans/auth-refactor.mdx
+  mdxp --port 5199 docs/guide.mdx
+  mdxp --serve -p 5200 example/example.mdx
 
 Environment:
-  MDXV_ROOT        Viewer checkout (default: parent of this script's directory)
-  MDXV_SKILLS_DIR  Agent skills directory for setup (default: ~/.agents/skills)
-  MDXV_PORT        Default port for --serve when -p is not set
-  MDXV_OPEN        Override open behavior when --no-open is not set
+  MDXP_ROOT        Viewer checkout (default: parent of this script's directory)
+  MDXP_SKILLS_DIR  Agent skills directory for setup (default: ~/.agents/skills)
+  MDXP_PORT        Default port for --serve when -p is not set
+  MDXP_OPEN        Override open behavior when --no-open is not set
 EOF
 }
 
@@ -86,7 +86,7 @@ validate_port() {
 require_viewer_root() {
   if [[ ! -d "$VIEWER_ROOT" ]]; then
     echo "error: viewer not found at $VIEWER_ROOT" >&2
-    echo "set MDXV_ROOT to your mdx-viewer install" >&2
+    echo "set MDXP_ROOT to your mdx-planner install" >&2
     exit 1
   fi
 }
@@ -131,11 +131,11 @@ run_setup() {
   fi
   echo "skill: $skill_dest -> $(realpath "$skill_src")"
 
-  if command -v mdxv >/dev/null 2>&1; then
-    echo "path: mdxv is on PATH ($(command -v mdxv))"
+  if command -v mdxp >/dev/null 2>&1; then
+    echo "path: mdxp is on PATH ($(command -v mdxp))"
   else
-    echo "path: mdxv is not on PATH" >&2
-    echo "install with: npm install -g mdx-viewer" >&2
+    echo "path: mdxp is not on PATH" >&2
+    echo "install with: npm install -g mdx-planner" >&2
     echo "or add $(dirname "$script_path") to your PATH" >&2
   fi
 
@@ -149,7 +149,7 @@ port_flag=0
 no_open=0
 output=""
 components=0
-skills_dir="${MDXV_SKILLS_DIR:-${HOME}/.agents/skills}"
+skills_dir="${MDXP_SKILLS_DIR:-${HOME}/.agents/skills}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -278,43 +278,43 @@ fi
 
 if [[ ! -d "$VIEWER_ROOT" ]]; then
   echo "error: viewer not found at $VIEWER_ROOT" >&2
-  echo "set MDXV_ROOT to your mdx-viewer install" >&2
+  echo "set MDXP_ROOT to your mdx-planner install" >&2
   exit 1
 fi
 
 mdx_file="$(resolve_mdx_file "$mdx_target")"
-export MDXV_FILE="$mdx_file"
-export MDXV_MODE="$mode"
-export MDXV_PORT="${port:-${MDXV_PORT:-5199}}"
-validate_port "$MDXV_PORT"
+export MDXP_FILE="$mdx_file"
+export MDXP_MODE="$mode"
+export MDXP_PORT="${port:-${MDXP_PORT:-5199}}"
+validate_port "$MDXP_PORT"
 
 if [[ -n "$output" ]]; then
-  export MDXV_OUTPUT="$(realpath -m "$output")"
+  export MDXP_OUTPUT="$(realpath -m "$output")"
 fi
 
 case "$mode" in
   default)
-    export MDXV_HOST="127.0.0.1"
+    export MDXP_HOST="127.0.0.1"
     if [[ "$no_open" == 1 ]]; then
-      export MDXV_OPEN=0
+      export MDXP_OPEN=0
     else
-      export MDXV_OPEN="${MDXV_OPEN:-1}"
+      export MDXP_OPEN="${MDXP_OPEN:-1}"
     fi
     ;;
   listen)
-    export MDXV_HOST="127.0.0.1"
+    export MDXP_HOST="127.0.0.1"
     if [[ "$no_open" == 1 ]]; then
-      export MDXV_OPEN=0
+      export MDXP_OPEN=0
     else
-      export MDXV_OPEN="${MDXV_OPEN:-0}"
+      export MDXP_OPEN="${MDXP_OPEN:-0}"
     fi
     ;;
   serve)
-    export MDXV_HOST="0.0.0.0"
+    export MDXP_HOST="0.0.0.0"
     if [[ "$no_open" == 1 ]]; then
-      export MDXV_OPEN=0
+      export MDXP_OPEN=0
     else
-      export MDXV_OPEN="${MDXV_OPEN:-0}"
+      export MDXP_OPEN="${MDXP_OPEN:-0}"
     fi
     ;;
 esac

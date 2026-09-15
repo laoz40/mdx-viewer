@@ -56,7 +56,7 @@ async function ensureMermaid() {
 
 export async function renderMermaid(source) {
   const api = await ensureMermaid();
-  const id = `mdxv-mermaid-${++counter}`;
+  const id = `mdxp-mermaid-${++counter}`;
   const { svg } = await api.render(id, source);
   return svg;
 }

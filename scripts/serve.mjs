@@ -10,15 +10,15 @@ import { build } from "./build.mjs";
 import { resolveOutDir } from "./cache.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const mdxFile = process.env.MDXV_FILE;
+const mdxFile = process.env.MDXP_FILE;
 const mdxPath = mdxFile ? path.resolve(mdxFile) : path.resolve(root, "example/example.mdx");
-const mode = process.env.MDXV_MODE ?? "default";
-const port = Number(process.env.MDXV_PORT ?? 5199);
-const host = process.env.MDXV_HOST ?? (mode === "serve" ? "0.0.0.0" : "127.0.0.1");
-const openBrowser = process.env.MDXV_OPEN !== "0";
+const mode = process.env.MDXP_MODE ?? "default";
+const port = Number(process.env.MDXP_PORT ?? 5199);
+const host = process.env.MDXP_HOST ?? (mode === "serve" ? "0.0.0.0" : "127.0.0.1");
+const openBrowser = process.env.MDXP_OPEN !== "0";
 const outDir = await resolveOutDir(mdxPath);
-const htmlFileOverride = process.env.MDXV_OUTPUT
-  ? path.resolve(process.env.MDXV_OUTPUT)
+const htmlFileOverride = process.env.MDXP_OUTPUT
+  ? path.resolve(process.env.MDXP_OUTPUT)
   : undefined;
 
 function browserEnv() {

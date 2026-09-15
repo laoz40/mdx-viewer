@@ -6,15 +6,15 @@ import path from "node:path";
 export function cacheBaseDir() {
   const xdg = process.env.XDG_CACHE_HOME;
   if (xdg) {
-    return path.join(xdg, "mdxv");
+    return path.join(xdg, "mdxp");
   }
 
   const home = os.homedir();
   if (home) {
-    return path.join(home, ".cache", "mdxv");
+    return path.join(home, ".cache", "mdxp");
   }
 
-  return path.join(os.tmpdir(), `mdxv-${process.pid}`);
+  return path.join(os.tmpdir(), `mdxp-${process.pid}`);
 }
 
 export function cacheDirForMdx(mdxPath) {

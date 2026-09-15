@@ -1,4 +1,4 @@
-# mdx-viewer
+# mdx-planner
 
 Global MDX viewer for rich documents. No hosted UI, no per-project npm deps.
 
@@ -7,27 +7,27 @@ MDX components in `src/components/` follow the [visual-plan](https://github.com/
 ## Setup
 
 ```bash
-npm install -g mdx-viewer
-mdxv setup
+npm install -g mdx-planner
+mdxp setup
 ```
 
-`mdxv setup` symlinks the agent skill to `~/.agents/skills/mdx` and checks that `mdxv` is on PATH. Use `--skills-dir` or `MDXV_SKILLS_DIR` when that directory is not writable.
+`mdxp setup` symlinks the agent skill to `~/.agents/skills/mdx` and checks that `mdxp` is on PATH. Use `--skills-dir` or `MDXP_SKILLS_DIR` when that directory is not writable.
 
 ## Usage
 
 From any project with an MDX file:
 
 ```bash
-mdxv docs/guide.mdx                       # build to cache, open in browser
-mdxv docs/guide.mdx -o docs/guide.html    # explicit output path
-mdxv --no-open docs/guide.mdx             # build only, print output path
-mdxv --port 5199 docs/guide.mdx           # serve on localhost
-mdxv --serve -p 5200 docs/guide.mdx       # serve on all interfaces
-mdxv --components                         # print component source directory
-mdxv setup                                # re-run skill symlink + PATH check
+mdxp docs/guide.mdx                       # build to cache, open in browser
+mdxp docs/guide.mdx -o docs/guide.html    # explicit output path
+mdxp --no-open docs/guide.mdx             # build only, print output path
+mdxp --port 5199 docs/guide.mdx           # serve on localhost
+mdxp --serve -p 5200 docs/guide.mdx       # serve on all interfaces
+mdxp --components                         # print component source directory
+mdxp setup                                # re-run skill symlink + PATH check
 ```
 
-By default, HTML is written to the user cache under `$XDG_CACHE_HOME/mdxv/` (with fallbacks documented in the CLI). Use `-o` for an explicit path.
+By default, HTML is written to the user cache under `$XDG_CACHE_HOME/mdxp/` (with fallbacks documented in the CLI). Use `-o` for an explicit path.
 
 Commands and options:
 
@@ -42,10 +42,10 @@ Commands and options:
 
 Environment (optional overrides):
 
-- `MDXV_ROOT` — path to the viewer install
-- `MDXV_SKILLS_DIR` — agent skills directory for `setup`
-- `MDXV_PORT` — default port when serving
-- `MDXV_OPEN` — default open behavior when `--no-open` is not set
+- `MDXP_ROOT` — path to the viewer install
+- `MDXP_SKILLS_DIR` — agent skills directory for `setup`
+- `MDXP_PORT` — default port when serving
+- `MDXP_OPEN` — default open behavior when `--no-open` is not set
 
 ## MDX blocks
 
@@ -53,7 +53,7 @@ These tags match the visual-plan component set:
 
 `Diff`, `FileTree`, `Code`, `Callout`, `Mermaid`, `Tabs` / `Tab`.
 
-Run `mdxv --components` for the bundled component source path. Authoring contract: [`skills/mdx/SKILL.md`](skills/mdx/SKILL.md). Block reference: [visual-plan SKILL.md](https://github.com/BuilderIO/skills/blob/main/skills/visual-plan/SKILL.md).
+Run `mdxp --components` for the bundled component source path. Authoring contract: [`skills/mdx/SKILL.md`](skills/mdx/SKILL.md). Block reference: [visual-plan SKILL.md](https://github.com/BuilderIO/skills/blob/main/skills/visual-plan/SKILL.md).
 
 ## Attribution
 

@@ -1,8 +1,8 @@
 {
-  "name": "mdx-viewer",
+  "name": "mdx-planner",
   "version": "0.1.0",
   "bin": {
-    "mdxv": "bin/mdxv"
+    "mdxp": "bin/mdxp"
   },
   "files": [
     "bin/",
