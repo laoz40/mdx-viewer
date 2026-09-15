@@ -17,6 +17,7 @@ Modes:
   --serve         Build and serve on all interfaces (direct bind)
 
 Options:
+  --components     Print the component source directory and exit
   -p, --port PORT  Localhost server port (with --port) or bind port (with --serve)
   -o, --output PATH  Write HTML to an explicit path (default: user cache)
   --no-open        Do not open a browser tab
@@ -24,6 +25,7 @@ Options:
 Flags may appear before or after the document path.
 
 Examples:
+  mdxv --components
   mdxv docs/guide.mdx
   mdxv docs/guide.mdx -o docs/guide.html
   mdxv --no-open plans/auth-refactor.mdx
@@ -78,12 +80,17 @@ port=""
 port_flag=0
 no_open=0
 output=""
+components=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -h|--help)
       usage
       exit 0
+      ;;
+    --components)
+      components=1
+      shift
       ;;
     --serve)
       if [[ "$mode" == "listen" ]]; then
@@ -168,6 +175,25 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ "$components" == 1 ]]; then
+  if [[ -n "$mdx_target" ]]; then
+    echo "error: --components does not take a document path" >&2
+    exit 1
+  fi
+  if [[ ! -d "$VIEWER_ROOT" ]]; then
+    echo "error: viewer not found at $VIEWER_ROOT" >&2
+    echo "set MDXV_ROOT to your mdx-planner checkout" >&2
+    exit 1
+  fi
+  components_dir="$VIEWER_ROOT/src/components"
+  if [[ ! -d "$components_dir" ]]; then
+    echo "error: components not found at $components_dir" >&2
+    exit 1
+  fi
+  realpath "$components_dir"
+  exit 0
+fi
 
 if [[ -z "$mdx_target" ]]; then
   usage
