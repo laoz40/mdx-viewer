@@ -1,66 +1,48 @@
-# mdx-planner
+# mdx-viewer
 
-Local MDX viewer for rich documents (plans, guides, walkthroughs, demos). No hosted UI, no per-project npm deps.
+Global MDX viewer for rich documents. No hosted UI, no per-project npm deps.
 
 MDX components in `src/components/` follow the [visual-plan](https://github.com/BuilderIO/skills/tree/main/skills/visual-plan) block catalog from [BuilderIO/skills](https://github.com/BuilderIO/skills). See `example/example.mdx` for a component demo.
 
 ## Setup
 
 ```bash
-git clone <this-repo> mdx-planner
-cd mdx-planner
-pnpm install
+npm install -g mdx-viewer
+mdxv setup
 ```
 
-### CLI
-
-Symlink the bundled script onto your `PATH`:
-
-```bash
-ln -sf "$(pwd)/bin/mdxv" ~/.local/bin/mdxv
-```
-
-`mdxv` resolves this checkout from the script location. Set `MDXV_ROOT` if you symlink or copy it somewhere else.
-
-Without the CLI:
-
-```bash
-export MDXV_FILE=/path/to/document.mdx
-pnpm dev
-```
-
-### Agent skill
-
-For agents that load skills from `~/.agents/skills/` (Cursor, pi, etc.):
-
-```bash
-ln -sf "$(pwd)/skills/mdx" ~/.agents/skills/mdx
-```
-
-Source: [`skills/mdx/SKILL.md`](skills/mdx/SKILL.md). Tells agents how to author MDX and open it with `mdxv`.
+`mdxv setup` symlinks the agent skill to `~/.agents/skills/mdx` and checks that `mdxv` is on PATH.
 
 ## Usage
 
 From any project with an MDX file:
 
 ```bash
-mdxv docs/guide.mdx                       # build guide.html, open in browser
-mdxv --no-open plans/example.mdx          # build only, print output path
-mdxv --port 5199 docs/guide.mdx           # localhost server for Tailscale Serve
-mdxv --serve -p 5200 docs/guide.mdx       # direct bind on all interfaces
+mdxv docs/guide.mdx                       # build to cache, open in browser
+mdxv docs/guide.mdx -o docs/guide.html    # explicit output path
+mdxv --no-open docs/guide.mdx             # build only, print output path
+mdxv --port 5199 docs/guide.mdx           # serve on localhost
+mdxv --serve -p 5200 docs/guide.mdx       # serve on all interfaces
+mdxv --components                         # print component source directory
+mdxv setup                                # re-run skill symlink + PATH check
 ```
 
-Options:
+By default, HTML is written to the user cache under `$XDG_CACHE_HOME/mdxv/` (with fallbacks documented in the CLI). Use `-o` for an explicit path.
 
-- `--port PORT` — build and serve on `127.0.0.1` (keeps running; use with Tailscale Serve)
-- `--serve` — build and serve on `0.0.0.0` (direct bind for LAN/Tailscale IP)
-- `-p, --port PORT` — port for `--serve` (default `5199`)
+Commands and options:
+
+- `setup` — symlink skill, check PATH, print component source path
+- `--components` — print path to bundled component source (for agents)
+- `-o, --output PATH` — write HTML to an explicit path
+- `--port PORT` — build and serve on localhost
+- `--serve` — build and serve on all interfaces
+- `-p, --port PORT` — port when serving (default `5199`)
 - `--no-open` — skip opening a browser tab
 
 Environment (optional overrides):
 
-- `MDXV_ROOT` — path to this checkout (required if the CLI is not colocated with the repo)
-- `MDXV_PORT` — default port for `--serve` when `-p` is not set
+- `MDXV_ROOT` — path to the viewer install
+- `MDXV_PORT` — default port when serving
 - `MDXV_OPEN` — default open behavior when `--no-open` is not set
 
 ## MDX blocks
@@ -69,7 +51,7 @@ These tags match the visual-plan component set:
 
 `Diff`, `FileTree`, `Code`, `Callout`, `Mermaid`, `Tabs` / `Tab`.
 
-Component source: [`src/components/`](src/components/). Authoring contract: [`skills/mdx/SKILL.md`](skills/mdx/SKILL.md). Block reference: [visual-plan SKILL.md](https://github.com/BuilderIO/skills/blob/main/skills/visual-plan/SKILL.md).
+Run `mdxv --components` for the bundled component source path. Authoring contract: [`skills/mdx/SKILL.md`](skills/mdx/SKILL.md). Block reference: [visual-plan SKILL.md](https://github.com/BuilderIO/skills/blob/main/skills/visual-plan/SKILL.md).
 
 ## Attribution
 

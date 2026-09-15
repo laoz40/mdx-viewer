@@ -1,5 +1,5 @@
 {
-  "name": "mdx-planner",
+  "name": "mdx-viewer",
   "version": "0.1.0",
   "bin": {
     "mdxv": "bin/mdxv"

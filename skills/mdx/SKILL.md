@@ -1,16 +1,30 @@
 ---
 name: mdx
-description: Write structured MDX documents with custom components for visual explanations, walkthroughs, diagrams, and other rich docs. Use when the user wants MDX with Diff, FileTree, Mermaid, Callouts, etc.
+description: Write structured MDX documents with custom components for visual explanations and rich docs. Use when authoring MDX for the mdx-viewer.
 ---
 
 # Create MDX
+
+## Setup
+
+```bash
+npm install -g mdx-viewer
+mdxv setup
+```
+
+`mdxv setup` symlinks this skill to `~/.agents/skills/mdx` and checks that `mdxv` is on PATH.
 
 ## Output
 
 Write MDX to a path in the current project (e.g. `docs/<slug>.mdx` or a path the user specifies).
 
 - Open locally with `mdxv <path>` from the project root.
+- Default HTML goes to the user cache (`$XDG_CACHE_HOME/mdxv/<hash>/`). Use `-o path.html` for an explicit output path.
 - Do not add npm deps to the project. Do not copy React components into the repo.
+
+## Component source
+
+To read component implementation (props, behavior), run `mdxv --components`. It prints the path to `src/components/` in the global install. Do not copy those files into user projects.
 
 ## Authoring rules
 
