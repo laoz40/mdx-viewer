@@ -11,7 +11,7 @@ npm install -g mdx-viewer
 mdxv setup
 ```
 
-`mdxv setup` symlinks the agent skill to `~/.agents/skills/mdx` and checks that `mdxv` is on PATH.
+`mdxv setup` symlinks the agent skill to `~/.agents/skills/mdx` and checks that `mdxv` is on PATH. Use `--skills-dir` or `MDXV_SKILLS_DIR` when that directory is not writable.
 
 ## Usage
 
@@ -32,6 +32,7 @@ By default, HTML is written to the user cache under `$XDG_CACHE_HOME/mdxv/` (wit
 Commands and options:
 
 - `setup` — symlink skill, check PATH, print component source path
+- `--skills-dir PATH` — agent skills directory for `setup` (default `~/.agents/skills`)
 - `--components` — print path to bundled component source (for agents)
 - `-o, --output PATH` — write HTML to an explicit path
 - `--port PORT` — build and serve on localhost
@@ -42,6 +43,7 @@ Commands and options:
 Environment (optional overrides):
 
 - `MDXV_ROOT` — path to the viewer install
+- `MDXV_SKILLS_DIR` — agent skills directory for `setup`
 - `MDXV_PORT` — default port when serving
 - `MDXV_OPEN` — default open behavior when `--no-open` is not set
 

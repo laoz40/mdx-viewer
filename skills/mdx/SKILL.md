@@ -5,15 +5,6 @@ description: Write structured MDX documents with custom components for visual ex
 
 # Create MDX
 
-## Setup
-
-```bash
-npm install -g mdx-viewer
-mdxv setup
-```
-
-`mdxv setup` symlinks this skill to `~/.agents/skills/mdx` and checks that `mdxv` is on PATH.
-
 ## Output
 
 Write MDX to a path in the current project (e.g. `docs/<slug>.mdx` or a path the user specifies).
