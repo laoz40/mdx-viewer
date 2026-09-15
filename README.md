@@ -45,7 +45,7 @@ From any project with an MDX file:
 
 ```bash
 mdxv docs/guide.mdx                       # build guide.html, open in browser
-mdxv --no-open plans/example/plan.mdx     # build only, print output path
+mdxv --no-open plans/example.mdx          # build only, print output path
 mdxv --port 5199 docs/guide.mdx           # localhost server for Tailscale Serve
 mdxv --serve -p 5200 docs/guide.mdx       # direct bind on all interfaces
 ```

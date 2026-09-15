@@ -24,7 +24,7 @@ Flags may appear before or after the document path.
 
 Examples:
   mdxv docs/guide.mdx
-  mdxv --no-open plans/auth-refactor/plan.mdx
+  mdxv --no-open plans/auth-refactor.mdx
   mdxv --port 5199 docs/guide.mdx
   mdxv --serve -p 5200 example/example.mdx
 
