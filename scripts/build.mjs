@@ -6,6 +6,7 @@ import mdx from "@mdx-js/esbuild";
 import remarkGfm from "remark-gfm";
 
 import { remarkPrehighlight } from "./remark-prehighlight.mjs";
+import { remarkPrerenderMermaid } from "./remark-prerender-mermaid.mjs";
 
 export function pageTitle(mdxPath) {
   const baseName = path.basename(mdxPath);
@@ -38,29 +39,8 @@ export async function stageMdx(mdxPath, outDir) {
   return stagedMdx;
 }
 
-export function documentUsesMermaid(mdxSource) {
-  return /<Mermaid[\s/>]/.test(mdxSource);
-}
-
-function mermaidStubPlugin({ root, usesMermaid }) {
-  if (usesMermaid) {
-    return { name: "mermaid-stub", setup() {} };
-  }
-
-  const stub = path.join(root, "src/components/Mermaid.stub.tsx");
-
-  return {
-    name: "mermaid-stub",
-    setup(build) {
-      build.onResolve({ filter: /^\.\/components\/Mermaid$/ }, () => ({ path: stub }));
-    },
-  };
-}
-
 export async function build({ root, mdxPath, outDir, metafile = false }) {
   const stagedMdx = await stageMdx(mdxPath, outDir);
-  const mdxSource = await readFile(stagedMdx, "utf8");
-  const usesMermaid = documentUsesMermaid(mdxSource);
 
   const result = await esbuild.build({
     absWorkingDir: root,
@@ -77,10 +57,9 @@ export async function build({ root, mdxPath, outDir, metafile = false }) {
     jsxImportSource: "react",
     metafile,
     plugins: [
-      mermaidStubPlugin({ root, usesMermaid }),
       mdx({
         providerImportSource: "@mdx-js/react",
-        remarkPlugins: [remarkGfm, remarkPrehighlight],
+        remarkPlugins: [remarkGfm, remarkPrehighlight, remarkPrerenderMermaid],
       }),
     ],
     alias: {

@@ -1,43 +1,13 @@
-import mermaid from "mermaid";
-import { useEffect, useId, useRef } from "react";
-
 type MermaidProps = {
   source: string;
   caption?: string;
+  svg: string;
 };
 
-let initialized = false;
-
-export function Mermaid({ source, caption }: MermaidProps) {
-  const id = useId().replace(/:/g, "");
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!initialized) {
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: "dark",
-        securityLevel: "loose",
-      });
-      initialized = true;
-    }
-
-    const node = containerRef.current;
-    if (!node) return;
-
-    let cancelled = false;
-    void mermaid.render(`mermaid-${id}`, source).then(({ svg }) => {
-      if (!cancelled) node.innerHTML = svg;
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, source]);
-
+export function Mermaid({ caption, svg }: MermaidProps) {
   return (
     <figure className="mermaid-block">
-      <div ref={containerRef} className="mermaid-block__diagram" />
+      <div className="mermaid-block__diagram" dangerouslySetInnerHTML={{ __html: svg }} />
       {caption && <figcaption>{caption}</figcaption>}
     </figure>
   );
