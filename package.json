@@ -1,6 +1,12 @@
 {
   "name": "mdx-planner",
   "version": "0.1.0",
+  "description": "Global MDX viewer for rich documents. No hosted UI, no per-project npm deps.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laoz40/mdx-viewer.git"
+  },
   "bin": {
     "mdxp": "bin/mdxp"
   },
