@@ -6,6 +6,7 @@ import mdx from "@mdx-js/esbuild";
 import remarkGfm from "remark-gfm";
 
 import { remarkPrehighlight } from "./remark-prehighlight.mjs";
+import { remarkPrerenderCallout } from "./remark-prerender-callout.mjs";
 import { remarkPrerenderMermaid } from "./remark-prerender-mermaid.mjs";
 
 export function pageTitle(mdxPath) {
@@ -59,7 +60,12 @@ export async function build({ root, mdxPath, outDir, metafile = false }) {
     plugins: [
       mdx({
         providerImportSource: "@mdx-js/react",
-        remarkPlugins: [remarkGfm, remarkPrehighlight, remarkPrerenderMermaid],
+        remarkPlugins: [
+          remarkGfm,
+          remarkPrehighlight,
+          remarkPrerenderCallout,
+          remarkPrerenderMermaid,
+        ],
       }),
     ],
     alias: {

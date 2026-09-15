@@ -1,18 +1,15 @@
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-
 import type { CalloutTone } from "../types";
 
 type CalloutProps = {
   tone?: CalloutTone;
-  body: string;
+  html: string;
 };
 
-export function Callout({ tone = "info", body }: CalloutProps) {
+export function Callout({ tone = "info", html }: CalloutProps) {
   return (
     <aside className={`callout callout--${tone}`}>
       <div className="callout__label">{tone}</div>
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
+      <div dangerouslySetInnerHTML={{ __html: html }} />
     </aside>
   );
 }
