@@ -76,8 +76,8 @@ export async function build({ root, mdxPath, outDir, metafile = false }) {
   }
 
   const css = result.outputFiles.find((file) => file.path.endsWith(".css"))?.text ?? "";
-  const faviconSvg = await readFile(path.join(root, "public/favicon.svg"), "utf8");
-  const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
+  const favicon = await readFile(path.join(root, "public/favicon.ico"));
+  const faviconHref = `data:image/x-icon;base64,${favicon.toString("base64")}`;
   const title = escapeHtml(pageTitle(mdxPath));
   const safeJs = js.replace(/<\/script/gi, "<\\/script");
 
@@ -85,7 +85,7 @@ export async function build({ root, mdxPath, outDir, metafile = false }) {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="${faviconHref}" />
+    <link rel="icon" type="image/x-icon" href="${faviconHref}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${title}</title>
     <style>${css}</style>
