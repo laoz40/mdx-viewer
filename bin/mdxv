@@ -8,8 +8,14 @@ VIEWER_ROOT="${MDXV_ROOT:-$(cd "$script_dir/.." && pwd)}"
 usage() {
   cat <<'EOF'
 Usage: mdxv [options] <folder|file.mdx>
+       mdxv setup
+       mdxv --components
 
 Build and view an MDX document with the global mdx-planner viewer.
+
+Commands:
+  setup            Symlink the MDX skill and verify CLI setup
+  --components     Print the component source directory and exit
 
 Modes:
   (default)       Build a self-contained HTML file and open it in a browser
@@ -17,7 +23,6 @@ Modes:
   --serve         Build and serve on all interfaces (direct bind)
 
 Options:
-  --components     Print the component source directory and exit
   -p, --port PORT  Localhost server port (with --port) or bind port (with --serve)
   -o, --output PATH  Write HTML to an explicit path (default: user cache)
   --no-open        Do not open a browser tab
@@ -25,6 +30,7 @@ Options:
 Flags may appear before or after the document path.
 
 Examples:
+  mdxv setup
   mdxv --components
   mdxv docs/guide.mdx
   mdxv docs/guide.mdx -o docs/guide.html
@@ -72,6 +78,50 @@ validate_port() {
     echo "error: invalid port: $value" >&2
     exit 1
   fi
+}
+
+require_viewer_root() {
+  if [[ ! -d "$VIEWER_ROOT" ]]; then
+    echo "error: viewer not found at $VIEWER_ROOT" >&2
+    echo "set MDXV_ROOT to your mdx-planner checkout" >&2
+    exit 1
+  fi
+}
+
+components_dir_path() {
+  require_viewer_root
+  local components_dir="$VIEWER_ROOT/src/components"
+  if [[ ! -d "$components_dir" ]]; then
+    echo "error: components not found at $components_dir" >&2
+    exit 1
+  fi
+  realpath "$components_dir"
+}
+
+run_setup() {
+  require_viewer_root
+
+  local skill_src="$VIEWER_ROOT/skills/mdx"
+  local skill_dest="${HOME}/.agents/skills/mdx"
+
+  if [[ ! -d "$skill_src" ]]; then
+    echo "error: skill not found at $skill_src" >&2
+    exit 1
+  fi
+
+  mkdir -p "${HOME}/.agents/skills"
+  ln -sfn "$skill_src" "$skill_dest"
+  echo "skill: $skill_dest -> $(realpath "$skill_src")"
+
+  if command -v mdxv >/dev/null 2>&1; then
+    echo "path: mdxv is on PATH ($(command -v mdxv))"
+  else
+    echo "path: mdxv is not on PATH" >&2
+    echo "install with: npm install -g mdx-planner" >&2
+    echo "or add $(dirname "$script_path") to your PATH" >&2
+  fi
+
+  echo "components: $(components_dir_path)"
 }
 
 mode="default"
@@ -181,17 +231,12 @@ if [[ "$components" == 1 ]]; then
     echo "error: --components does not take a document path" >&2
     exit 1
   fi
-  if [[ ! -d "$VIEWER_ROOT" ]]; then
-    echo "error: viewer not found at $VIEWER_ROOT" >&2
-    echo "set MDXV_ROOT to your mdx-planner checkout" >&2
-    exit 1
-  fi
-  components_dir="$VIEWER_ROOT/src/components"
-  if [[ ! -d "$components_dir" ]]; then
-    echo "error: components not found at $components_dir" >&2
-    exit 1
-  fi
-  realpath "$components_dir"
+  components_dir_path
+  exit 0
+fi
+
+if [[ "$mdx_target" == "setup" ]]; then
+  run_setup
   exit 0
 fi
 
