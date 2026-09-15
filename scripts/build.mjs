@@ -66,6 +66,8 @@ export async function build({ root, mdxPath, outDir, metafile = false }) {
     absWorkingDir: root,
     entryPoints: [path.join(root, "src/main.tsx")],
     bundle: true,
+    minify: true,
+    define: { "process.env.NODE_ENV": '"production"' },
     write: false,
     format: "iife",
     outfile: path.join(outDir, "bundle.js"),
