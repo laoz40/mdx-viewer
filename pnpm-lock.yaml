@@ -209,6 +209,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.4
         version: 19.3.0(@types/react@19.3.0)
+      dompurify:
+        specifier: ^3.4.15
+        version: 3.4.15
       mermaid:
         specifier: ^11.17.2
         version: 11.17.2

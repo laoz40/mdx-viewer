@@ -1,14 +1,17 @@
 import { createHTMLWindow } from "svgdom";
-import mermaid from "mermaid";
+import createDOMPurify from "dompurify";
 
 let initialized = false;
 let counter = 0;
+/** @type {typeof import("mermaid").default | null} */
+let mermaid = null;
 
-function ensureDom() {
-  if (!globalThis.window?.document?.createElementNS) {
-    const svgWindow = createHTMLWindow();
-    Object.assign(globalThis, { window: svgWindow, document: svgWindow.document });
-  }
+function setupDom() {
+  if (globalThis.window?.document?.createElementNS) return;
+
+  const svgWindow = createHTMLWindow();
+  Object.assign(globalThis, { window: svgWindow, document: svgWindow.document });
+  Object.assign(createDOMPurify, createDOMPurify(svgWindow));
 
   if (!globalThis.CSSStyleSheet) {
     globalThis.CSSStyleSheet = class CSSStyleSheet {
@@ -31,22 +34,29 @@ function ensureDom() {
   }
 }
 
-function ensureMermaid() {
-  ensureDom();
-  if (initialized) return;
+setupDom();
 
-  mermaid.initialize({
-    startOnLoad: false,
-    theme: "dark",
-    securityLevel: "loose",
-    htmlLabels: false,
-  });
-  initialized = true;
+async function ensureMermaid() {
+  if (!mermaid) {
+    mermaid = (await import("mermaid")).default;
+  }
+
+  if (!initialized) {
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: "dark",
+      securityLevel: "loose",
+      htmlLabels: false,
+    });
+    initialized = true;
+  }
+
+  return mermaid;
 }
 
 export async function renderMermaid(source) {
-  ensureMermaid();
+  const api = await ensureMermaid();
   const id = `mdxv-mermaid-${++counter}`;
-  const { svg } = await mermaid.render(id, source);
+  const { svg } = await api.render(id, source);
   return svg;
 }
