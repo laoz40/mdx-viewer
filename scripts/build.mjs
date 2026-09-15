@@ -40,11 +40,18 @@ export async function stageMdx(mdxPath, outDir) {
   return stagedMdx;
 }
 
-export async function build({ root, mdxPath, outDir, metafile = false }) {
+export async function build({
+  root,
+  mdxPath,
+  outDir,
+  htmlFile: htmlFileOverride,
+  metafile = false,
+}) {
   const stagedMdx = await stageMdx(mdxPath, outDir);
 
   const result = await esbuild.build({
     absWorkingDir: root,
+    nodePaths: [path.join(root, "node_modules")],
     entryPoints: [path.join(root, "src/main.tsx")],
     bundle: true,
     minify: true,
@@ -103,7 +110,8 @@ export async function build({ root, mdxPath, outDir, metafile = false }) {
 </html>
 `;
 
-  const htmlFile = path.join(outDir, outputFileName(mdxPath));
+  const htmlFile = htmlFileOverride ?? path.join(outDir, outputFileName(mdxPath));
+  await mkdir(path.dirname(htmlFile), { recursive: true });
   await writeFile(htmlFile, html);
 
   return {

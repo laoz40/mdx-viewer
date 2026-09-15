@@ -18,12 +18,14 @@ Modes:
 
 Options:
   -p, --port PORT  Localhost server port (with --port) or bind port (with --serve)
+  -o, --output PATH  Write HTML to an explicit path (default: user cache)
   --no-open        Do not open a browser tab
 
 Flags may appear before or after the document path.
 
 Examples:
   mdxv docs/guide.mdx
+  mdxv docs/guide.mdx -o docs/guide.html
   mdxv --no-open plans/auth-refactor.mdx
   mdxv --port 5199 docs/guide.mdx
   mdxv --serve -p 5200 example/example.mdx
@@ -75,6 +77,7 @@ mdx_target=""
 port=""
 port_flag=0
 no_open=0
+output=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -130,6 +133,26 @@ while [[ $# -gt 0 ]]; do
       no_open=1
       shift
       ;;
+    -o|--output)
+      if [[ -z "${2:-}" ]]; then
+        echo "error: --output requires a value" >&2
+        exit 1
+      fi
+      if [[ -n "$output" ]]; then
+        echo "error: --output specified more than once" >&2
+        exit 1
+      fi
+      output="$2"
+      shift 2
+      ;;
+    --output=*)
+      if [[ -n "$output" ]]; then
+        echo "error: --output specified more than once" >&2
+        exit 1
+      fi
+      output="${1#*=}"
+      shift
+      ;;
     -*)
       echo "error: unknown option: $1" >&2
       usage >&2
@@ -162,6 +185,10 @@ export MDXV_FILE="$mdx_file"
 export MDXV_MODE="$mode"
 export MDXV_PORT="${port:-${MDXV_PORT:-5199}}"
 validate_port "$MDXV_PORT"
+
+if [[ -n "$output" ]]; then
+  export MDXV_OUTPUT="$(realpath -m "$output")"
+fi
 
 case "$mode" in
   default)

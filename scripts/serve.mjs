@@ -7,6 +7,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { build } from "./build.mjs";
+import { resolveOutDir } from "./cache.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const mdxFile = process.env.MDXV_FILE;
@@ -15,7 +16,10 @@ const mode = process.env.MDXV_MODE ?? "default";
 const port = Number(process.env.MDXV_PORT ?? 5199);
 const host = process.env.MDXV_HOST ?? (mode === "serve" ? "0.0.0.0" : "127.0.0.1");
 const openBrowser = process.env.MDXV_OPEN !== "0";
-const outDir = path.join(root, ".mdxv-out");
+const outDir = await resolveOutDir(mdxPath);
+const htmlFileOverride = process.env.MDXV_OUTPUT
+  ? path.resolve(process.env.MDXV_OUTPUT)
+  : undefined;
 
 function browserEnv() {
   if (process.env.WAYLAND_DISPLAY || process.env.DISPLAY) {
@@ -113,7 +117,7 @@ async function serve(htmlFile) {
 }
 
 console.log("building...");
-const { htmlFile } = await build({ root, mdxPath, outDir });
+const { htmlFile } = await build({ root, mdxPath, outDir, htmlFile: htmlFileOverride });
 
 console.log(`input: ${mdxPath}`);
 console.log(`output: ${htmlFile}`);

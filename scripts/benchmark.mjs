@@ -6,9 +6,9 @@ import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 
 import { build } from "./build.mjs";
+import { resolveOutDir } from "./cache.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const outDir = path.join(root, ".mdxv-out");
 
 function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} B`;
@@ -84,6 +84,7 @@ Examples:
 }
 
 async function runOnce(mdxPath, withMetafile) {
+  const outDir = await resolveOutDir(mdxPath);
   const start = performance.now();
   const result = await build({ root, mdxPath, outDir, metafile: withMetafile });
   const buildMs = performance.now() - start;
