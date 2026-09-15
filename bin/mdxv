@@ -191,10 +191,4 @@ case "$mode" in
 esac
 
 cd "$VIEWER_ROOT"
-
-if [[ ! -d node_modules ]]; then
-  echo "installing viewer dependencies..."
-  pnpm install
-fi
-
-exec pnpm dev
+exec node scripts/serve.mjs

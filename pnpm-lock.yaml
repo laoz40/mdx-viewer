@@ -175,21 +175,39 @@ importers:
       diff:
         specifier: ^9.0.0
         version: 9.0.0
+      dompurify:
+        specifier: ^3.4.15
+        version: 3.4.15
       esbuild:
         specifier: ^0.25.12
         version: 0.25.12
+      mermaid:
+        specifier: ^11.17.2
+        version: 11.17.2
       react:
         specifier: ^19.2.8
         version: 19.3.0
       react-dom:
         specifier: ^19.2.8
         version: 19.3.0(react@19.3.0)
+      rehype-stringify:
+        specifier: ^10.0.1
+        version: 10.0.1
+      remark:
+        specifier: ^15.0.1
+        version: 15.0.1
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
+      remark-rehype:
+        specifier: ^11.1.2
+        version: 11.1.2
       shiki:
         specifier: ^4.4.3
         version: 4.4.3
+      svgdom:
+        specifier: ^0.1.29
+        version: 0.1.29
     devDependencies:
       '@types/diff':
         specifier: ^7.0.2
@@ -206,30 +224,12 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.4
         version: 19.3.0(@types/react@19.3.0)
-      dompurify:
-        specifier: ^3.4.15
-        version: 3.4.15
-      mermaid:
-        specifier: ^11.17.2
-        version: 11.17.2
       oxfmt:
         specifier: ^0.67.0
         version: 0.67.0
       oxlint:
         specifier: ^1.79.0
         version: 1.82.0
-      rehype-stringify:
-        specifier: ^10.0.1
-        version: 10.0.1
-      remark:
-        specifier: ^15.0.1
-        version: 15.0.1
-      remark-rehype:
-        specifier: ^11.1.2
-        version: 11.1.2
-      svgdom:
-        specifier: ^0.1.29
-        version: 0.1.29
       typescript:
         specifier: ~6.0.2
         version: 6.0.3

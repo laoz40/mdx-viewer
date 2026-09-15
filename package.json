@@ -1,24 +1,40 @@
 {
   "name": "mdx-planner",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "bin": {
+    "mdxv": "bin/mdxv"
+  },
+  "files": [
+    "bin/",
+    "scripts/",
+    "src/",
+    "public/",
+    "skills/"
+  ],
   "type": "module",
   "scripts": {
     "dev": "node scripts/serve.mjs",
     "lint": "oxlint",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "benchmark": "node scripts/benchmark.mjs"
+    "benchmark": "node scripts/benchmark.mjs",
+    "prepublishOnly": "npm run lint && npm run fmt:check"
   },
   "dependencies": {
     "@mdx-js/esbuild": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
     "diff": "^9.0.0",
+    "dompurify": "^3.4.15",
     "esbuild": "^0.25.12",
+    "mermaid": "^11.17.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "rehype-stringify": "^10.0.1",
+    "remark": "^15.0.1",
     "remark-gfm": "^4.0.1",
-    "shiki": "^4.4.3"
+    "remark-rehype": "^11.1.2",
+    "shiki": "^4.4.3",
+    "svgdom": "^0.1.29"
   },
   "devDependencies": {
     "@types/diff": "^7.0.2",
@@ -26,14 +42,8 @@
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
-    "dompurify": "^3.4.15",
-    "mermaid": "^11.17.2",
     "oxfmt": "^0.67.0",
     "oxlint": "^1.79.0",
-    "rehype-stringify": "^10.0.1",
-    "remark": "^15.0.1",
-    "remark-rehype": "^11.1.2",
-    "svgdom": "^0.1.29",
     "typescript": "~6.0.2"
   },
   "packageManager": "pnpm@12.4.1+sha512.2e81e399d73fe8390dab25e06aa788ab7a5908248d2f5a370f82b481147a6a7a367bf8048f9a6fdb6460f21a66f0542dedb8b94ca2c8723596741920b1656d4c"
